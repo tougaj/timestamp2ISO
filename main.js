@@ -23,4 +23,5 @@ const resetToCurrentDateTime = () => {
 	$("#editDate").val(mmCurrent.format("YYYY-MM-DD"));
 	$("#editTime").val(mmCurrent.format("HH:mm"));
 	printUTCDate();
+	$("#utcDate").focus().select();
 };
