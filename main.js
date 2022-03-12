@@ -4,6 +4,7 @@ $(function () {
 	$('#formTimeStamp').on('submit', onTimeStampSubmit);
 	$('#btnReset').on('click', resetToCurrentDateTime);
 	$('#formLat input[name]').add('#formLon input[name]').on('change', onDegreeChange);
+	$('.btn-copy-to-clipboard').on('click', copyInputToClipboard);
 	resetToCurrentDateTime();
 	onDegreeChange();
 });
@@ -41,3 +42,16 @@ const onDegreeChange = () => {
 		getDegree(document.getElementById('formLon')),
 	].join(', ');
 };
+
+function copyInputToClipboard() {
+	const classForToggle = 'btn-outline-secondary btn-outline-success';
+	const timeout = 1000;
+	const button = $(this);
+	const input = button.siblings('input')[0];
+	navigator.clipboard.writeText(input.value);
+
+	button.toggleClass(classForToggle);
+	setTimeout(() => button.toggleClass(classForToggle), timeout);
+
+	new bootstrap.Toast(document.getElementById('liveToast'), { delay: timeout }).show();
+}

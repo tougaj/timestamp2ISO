@@ -42,7 +42,15 @@
 						</div>
 						<div class="col-4">
 							<label for="utcDate" class="form-label">Час</label>
-							<input type="text" class="form-control" id="utcDate" value="" readonly />
+							<div class="input-group">
+								<input type="text" class="form-control" id="utcDate" value="" readonly />
+								<button
+									class="btn btn-outline-secondary btn-copy-to-clipboard"
+									title="Копіювати в буфер обміну"
+								>
+									<i class="bi bi-files"></i>
+								</button>
+							</div>
 						</div>
 						<div class="col-2 align-self-end">
 							<button class="btn btn-secondary" id="btnReset">Скинути в поточні</button>
@@ -126,16 +134,29 @@
 				</form>
 				<div class="col-12 col-lg-4">
 					<label for="editDegreeNumeric" class="form-label">Десяткові координати</label>
-					<input
-						readonly
-						type="text"
-						id="editDegreeNumeric"
-						class="form-control"
-						value="0"
-						autocomplete="off"
-					/>
+					<div class="input-group">
+						<input
+							readonly
+							type="text"
+							id="editDegreeNumeric"
+							class="form-control"
+							value="0"
+							autocomplete="off"
+						/>
+						<button
+							class="btn btn-outline-secondary btn-copy-to-clipboard"
+							title="Копіювати в буфер обміну"
+						>
+							<i class="bi bi-files"></i>
+						</button>
+					</div>
 				</div>
 			</section>
+		</div>
+		<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+			<div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+				<div class="toast-body bg-success text-white">Скопійовано до буферу обміну</div>
+			</div>
 		</div>
 		<script
 			src="https://code.jquery.com/jquery-3.6.0.min.js"
