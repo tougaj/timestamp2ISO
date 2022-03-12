@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Конвертація дати та часу в UTC</title>
+		<title>Помічники конвертації</title>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
@@ -16,34 +16,126 @@
 			integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
 			crossorigin="anonymous"
 		/>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" />
 		<link rel="stylesheet" href="./style.css" />
 	</head>
 	<body>
 		<div class="container">
 			<div class="row">
 				<div class="col">
-					<h2>Конвертація дати та часу в UTC</h2>
+					<h1 class="border-bottom"><i class="bi bi-magic"></i> Помічники конвертації</h1>
 				</div>
 			</div>
-			<form class="row" id="formTimeStamp">
-				<div class="col-3">
-					<label for="editDate" class="form-label">Дата</label>
-					<input type="date" class="form-control" id="editDate" value="" />
+			<section class="row mt-3">
+				<div class="col-12">
+					<h2><i class="bi bi-clock"></i> Конвертація дати та часу в UTC</h2>
 				</div>
-				<div class="col-3">
-					<label for="editTime" class="form-label">Час</label>
-					<input type="time" class="form-control" id="editTime" value="" />
+				<div class="col-12">
+					<form class="row" id="formTimeStamp">
+						<div class="col-3">
+							<label for="editDate" class="form-label">Дата</label>
+							<input type="date" class="form-control" id="editDate" value="" />
+						</div>
+						<div class="col-3">
+							<label for="editTime" class="form-label">Час</label>
+							<input type="time" class="form-control" id="editTime" value="" />
+						</div>
+						<div class="col-4">
+							<label for="utcDate" class="form-label">Час</label>
+							<input type="text" class="form-control" id="utcDate" value="" readonly />
+						</div>
+						<div class="col-2 align-self-end">
+							<button class="btn btn-secondary" id="btnReset">Скинути в поточні</button>
+						</div>
+					</form>
 				</div>
-				<div class="col-6">
-					<label for="editTime" class="form-label">Час</label>
-					<input type="text" class="form-control" id="utcDate" value="" readonly />
+			</section>
+			<section class="row mt-3">
+				<div class="col-12">
+					<h2><i class="bi bi-globe"></i> Конвертація градусних координат в десяткові</h2>
 				</div>
-			</form>
-			<div class="row mt-3">
-				<div class="col text-center">
-					<button class="btn btn-secondary" id="btnReset">Скинути в поточні</button>
+				<form class="col-6 col-lg-4" id="formLat">
+					<label class="form-label">Північна широта</label>
+					<div class="input-group mb-3">
+						<input
+							type="number"
+							class="form-control"
+							name="degrees"
+							min="0"
+							max="180"
+							value="0"
+							autocomplete="off"
+						/>
+						<span class="input-group-text">&deg;</span>
+						<input
+							type="number"
+							class="form-control"
+							name="minutes"
+							min="0"
+							max="59"
+							value="0"
+							autocomplete="off"
+						/>
+						<span class="input-group-text">'</span>
+						<input
+							type="number"
+							class="form-control"
+							name="seconds"
+							min="0"
+							max="59"
+							value="0"
+							autocomplete="off"
+						/>
+						<span class="input-group-text">"</span>
+					</div>
+				</form>
+				<form class="col-6 col-lg-4" id="formLon">
+					<label class="form-label">Східна довгота</label>
+					<div class="input-group mb-3">
+						<input
+							type="number"
+							class="form-control"
+							name="degrees"
+							min="0"
+							max="90"
+							value="0"
+							autocomplete="off"
+						/>
+						<span class="input-group-text">&deg;</span>
+						<input
+							type="number"
+							class="form-control"
+							name="minutes"
+							min="0"
+							max="59"
+							value="0"
+							autocomplete="off"
+						/>
+						<span class="input-group-text">'</span>
+						<input
+							type="number"
+							class="form-control"
+							name="seconds"
+							min="0"
+							max="59"
+							value="0"
+							autocomplete="off"
+						/>
+						<span class="input-group-text">"</span>
+					</div>
+				</form>
+				<div class="col-12 col-lg-4">
+					<label for="editDegreeNumeric" class="form-label">Десяткові координати</label>
+					<input
+						readonly
+						type="text"
+						id="editDegreeNumeric"
+						class="form-control"
+						value="0"
+						autocomplete="off"
+					/>
 				</div>
-			</div>
+			</section>
 		</div>
 		<script
 			src="https://code.jquery.com/jquery-3.6.0.min.js"
