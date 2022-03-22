@@ -32,13 +32,16 @@
 				</div>
 				<div class="col-12">
 					<form class="row" id="formTimeStamp">
-						<div class="col-3">
+						<div class="col-4">
 							<label for="editDate" class="form-label">Дата</label>
 							<input type="date" class="form-control" id="editDate" value="" />
 						</div>
-						<div class="col-3">
+						<div class="col-4">
 							<label for="editTime" class="form-label">Час</label>
-							<input type="time" class="form-control" id="editTime" value="" />
+							<div class="input-group">
+								<input type="time" class="form-control" id="editTime" value="" />
+								<button class="btn btn-outline-secondary" id="btnReset" tabindex="-1"><i class="bi bi-arrow-clockwise"></i> Поточні</button>
+							</div>
 						</div>
 						<div class="col-4">
 							<label for="utcDate" class="form-label">Час</label>
@@ -51,9 +54,6 @@
 									<i class="bi bi-files"></i>
 								</button>
 							</div>
-						</div>
-						<div class="col-2 align-self-end">
-							<button class="btn btn-secondary" id="btnReset">Скинути в поточні</button>
 						</div>
 					</form>
 				</div>
