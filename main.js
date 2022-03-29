@@ -1,5 +1,3 @@
-const API_KEY = 'AIzaSyDBQj8I0ElYPaXxgInMT3Ped3BS9blqy8Q';
-
 $(function () {
 	$('#editDate').on('change', printUTCDate);
 	$('#editTime').on('change', printUTCDate);
@@ -67,8 +65,8 @@ const onDegreeChange = () => {
 	document.getElementById('editDegreeNumeric').value = coordinates;
 	document
 		.querySelector('.map-frame')
-		.setAttribute('src', `https://www.google.com/maps/embed/v1/place?q=${coordinates}&zoom=14&key=${API_KEY}`);
-	// .setAttribute('src', `https://maps.google.com/maps?q=${coordinates}&z=15&ie=UTF8&output=embed`);
+		// .setAttribute('src', `https://www.google.com/maps/embed/v1/place?q=${coordinates}&zoom=14&key=${API_KEY}`);
+		.setAttribute('src', `https://maps.google.com/maps?q=${coordinates}&z=14&ie=UTF8&output=embed`);
 };
 
 /**
