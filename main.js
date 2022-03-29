@@ -9,6 +9,9 @@ $(function () {
 	onDegreeChange();
 });
 
+/**
+ * Print the UTC date and time from the date and time inputs
+ */
 const printUTCDate = () => {
 	const date = $('#editDate').val();
 	const time = $('#editTime').val();
@@ -16,11 +19,18 @@ const printUTCDate = () => {
 	$('#utcDate').val(mm.toISOString());
 };
 
+/**
+ * Prints the current date and time in UTC format
+ * @param event - The event object that was triggered.
+ */
 const onTimeStampSubmit = (event) => {
 	event.preventDefault();
 	printUTCDate();
 };
 
+/**
+ * Reset the date and time fields to the current date and time
+ */
 const resetToCurrentDateTime = () => {
 	const mmCurrent = moment();
 	$('#editDate').val(mmCurrent.format('YYYY-MM-DD'));
@@ -29,20 +39,31 @@ const resetToCurrentDateTime = () => {
 	$('#utcDate').focus().select();
 };
 
-const getDegree = (form) =>
+/**
+ * Given a form with fields `degrees`, `minutes`, and `seconds`,
+ * return the decimal degree value of the coordinates
+ * @param form - The form object that we're working with.
+ */
+const getDecimalDegree = (form) =>
 	(
 		parseInt(form['degrees'].value) +
 		parseInt(form['minutes'].value) / 60 +
 		parseInt(form['seconds'].value) / 3600
 	).toLocaleString('en-US', { maximumFractionDigits: 8 });
 
+/**
+ * It takes the values of the formLat and formLon elements and converts them to decimal degrees.
+ */
 const onDegreeChange = () => {
 	document.getElementById('editDegreeNumeric').value = [
-		getDegree(document.getElementById('formLat')),
-		getDegree(document.getElementById('formLon')),
+		getDecimalDegree(document.getElementById('formLat')),
+		getDecimalDegree(document.getElementById('formLon')),
 	].join(', ');
 };
 
+/**
+ * It copies the value of the input to the clipboard.
+ */
 function copyInputToClipboard() {
 	const classForToggle = 'btn-outline-secondary btn-outline-success';
 	const timeout = 1000;
