@@ -1,3 +1,5 @@
+const API_KEY = 'AIzaSyDBQj8I0ElYPaXxgInMT3Ped3BS9blqy8Q';
+
 $(function () {
 	$('#editDate').on('change', printUTCDate);
 	$('#editTime').on('change', printUTCDate);
@@ -52,13 +54,21 @@ const getDecimalDegree = (form) =>
 	).toLocaleString('en-US', { maximumFractionDigits: 8 });
 
 /**
- * It takes the values of the formLat and formLon elements and converts them to decimal degrees.
+ * The function `onDegreeChange` is called when the user changes the degree values in the form.
+ * It uses the `getDecimalDegree` function to convert the degree values to decimal degrees,
+ * and then it uses the `setAttribute` method to set the `src` attribute of the `iframe` element to the
+ * Google Maps URL
  */
 const onDegreeChange = () => {
-	document.getElementById('editDegreeNumeric').value = [
+	const coordinates = [
 		getDecimalDegree(document.getElementById('formLat')),
 		getDecimalDegree(document.getElementById('formLon')),
 	].join(', ');
+	document.getElementById('editDegreeNumeric').value = coordinates;
+	document
+		.querySelector('.map-frame')
+		.setAttribute('src', `https://www.google.com/maps/embed/v1/place?q=${coordinates}&zoom=14&key=${API_KEY}`);
+	// .setAttribute('src', `https://maps.google.com/maps?q=${coordinates}&z=15&ie=UTF8&output=embed`);
 };
 
 /**

@@ -4,3 +4,7 @@ body {
 	padding-top: 1em;
 	background-color: #fefbfa;
 }
+
+.map-frame {
+	height: 50vh;
+}

@@ -37,11 +37,11 @@
 				</div>
 				<div class="col-12">
 					<form class="row" id="formTimeStamp">
-						<div class="col-4">
+						<div class="col-6 col-md-4">
 							<label for="editDate" class="form-label">Дата</label>
 							<input type="date" class="form-control" id="editDate" value="" />
 						</div>
-						<div class="col-4">
+						<div class="col-6 col-md-4">
 							<label for="editTime" class="form-label">Час</label>
 							<div class="input-group">
 								<input type="time" class="form-control" id="editTime" value="" />
@@ -50,7 +50,7 @@
 								</button>
 							</div>
 						</div>
-						<div class="col-4">
+						<div class="col-12 col-md-4">
 							<label for="utcDate" class="form-label">Час</label>
 							<div class="input-group">
 								<input type="text" class="form-control" id="utcDate" value="" readonly />
@@ -70,97 +70,105 @@
 				<div class="col-12">
 					<h2><i class="bi bi-globe"></i> Конвертація градусних координат в десяткові</h2>
 				</div>
-				<form class="col-6 col-lg-4" id="formLat">
-					<label class="form-label">Північна широта</label>
-					<div class="input-group mb-3">
-						<input
-							type="number"
-							class="form-control"
-							name="degrees"
-							min="0"
-							max="180"
-							value="0"
-							autocomplete="off"
-						/>
-						<span class="input-group-text">&deg;</span>
-						<input
-							type="number"
-							class="form-control"
-							name="minutes"
-							min="0"
-							max="59"
-							value="0"
-							autocomplete="off"
-						/>
-						<span class="input-group-text">'</span>
-						<input
-							type="number"
-							class="form-control"
-							name="seconds"
-							min="0"
-							max="59"
-							value="0"
-							autocomplete="off"
-						/>
-						<span class="input-group-text">"</span>
-					</div>
-				</form>
-				<form class="col-6 col-lg-4" id="formLon">
-					<label class="form-label">Східна довгота</label>
-					<div class="input-group mb-3">
-						<input
-							type="number"
-							class="form-control"
-							name="degrees"
-							min="0"
-							max="90"
-							value="0"
-							autocomplete="off"
-						/>
-						<span class="input-group-text">&deg;</span>
-						<input
-							type="number"
-							class="form-control"
-							name="minutes"
-							min="0"
-							max="59"
-							value="0"
-							autocomplete="off"
-						/>
-						<span class="input-group-text">'</span>
-						<input
-							type="number"
-							class="form-control"
-							name="seconds"
-							min="0"
-							max="59"
-							value="0"
-							autocomplete="off"
-						/>
-						<span class="input-group-text">"</span>
-					</div>
-				</form>
-				<div class="col-12 col-lg-4">
-					<label for="editDegreeNumeric" class="form-label">Десяткові координати</label>
-					<div class="input-group">
-						<input
-							readonly
-							type="text"
-							id="editDegreeNumeric"
-							class="form-control"
-							value="0"
-							autocomplete="off"
-						/>
-						<button
-							class="btn btn-outline-secondary btn-copy-to-clipboard"
-							title="Копіювати в буфер обміну"
-							tabindex="-1"
-						>
-							<i class="bi bi-files"></i>
-						</button>
+				<div class="col-12 col-md-6 col-lg-4">
+					<form id="formLat">
+						<label class="form-label">Північна широта</label>
+						<div class="input-group mb-3">
+							<input
+								type="number"
+								class="form-control"
+								name="degrees"
+								min="0"
+								max="180"
+								value="0"
+								autocomplete="off"
+							/>
+							<span class="input-group-text">&deg;</span>
+							<input
+								type="number"
+								class="form-control"
+								name="minutes"
+								min="0"
+								max="59"
+								value="0"
+								autocomplete="off"
+							/>
+							<span class="input-group-text">'</span>
+							<input
+								type="number"
+								class="form-control"
+								name="seconds"
+								min="0"
+								max="59"
+								value="0"
+								autocomplete="off"
+							/>
+							<span class="input-group-text">"</span>
+						</div>
+					</form>
+					<form id="formLon">
+						<label class="form-label">Східна довгота</label>
+						<div class="input-group mb-3">
+							<input
+								type="number"
+								class="form-control"
+								name="degrees"
+								min="0"
+								max="90"
+								value="0"
+								autocomplete="off"
+							/>
+							<span class="input-group-text">&deg;</span>
+							<input
+								type="number"
+								class="form-control"
+								name="minutes"
+								min="0"
+								max="59"
+								value="0"
+								autocomplete="off"
+							/>
+							<span class="input-group-text">'</span>
+							<input
+								type="number"
+								class="form-control"
+								name="seconds"
+								min="0"
+								max="59"
+								value="0"
+								autocomplete="off"
+							/>
+							<span class="input-group-text">"</span>
+						</div>
+					</form>
+					<div>
+						<label for="editDegreeNumeric" class="form-label">Десяткові координати</label>
+						<div class="input-group">
+							<input
+								readonly
+								type="text"
+								id="editDegreeNumeric"
+								class="form-control"
+								value="0"
+								autocomplete="off"
+							/>
+							<button
+								class="btn btn-outline-secondary btn-copy-to-clipboard"
+								title="Копіювати в буфер обміну"
+								tabindex="-1"
+							>
+								<i class="bi bi-files"></i>
+							</button>
+						</div>
 					</div>
 				</div>
+				<iframe class="map-frame col-12 col-md-6 col-lg-8" style="border: 0" loading="lazy" allowfullscreen>
+					></iframe
+				>
 			</section>
+			<!-- <section class="row">
+				<iframe class="map-frame" style="border: 0" loading="lazy" allowfullscreen> ></iframe>
+			</section> -->
 		</div>
 		<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
 			<div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
