@@ -1,3 +1,5 @@
+const API_KEY = 'AIzaSyDBQj8I0ElYPaXxgInMT3Ped3BS9blqy8Q';
+
 $(function () {
 	$('#editDate').on('change', printUTCDate);
 	$('#editTime').on('change', printUTCDate);
@@ -58,15 +60,25 @@ const getDecimalDegree = (form) =>
  * Google Maps URL
  */
 const onDegreeChange = () => {
+	// const coordinates = '50.43333333, 30.5'; // TODO: remove this after debug
 	const coordinates = [
 		getDecimalDegree(document.getElementById('formLat')),
 		getDecimalDegree(document.getElementById('formLon')),
 	].join(', ');
 	document.getElementById('editDegreeNumeric').value = coordinates;
-	document
-		.querySelector('.map-frame')
-		// .setAttribute('src', `https://www.google.com/maps/embed/v1/place?q=${coordinates}&zoom=14&key=${API_KEY}`);
-		.setAttribute('src', `https://maps.google.com/maps?q=${coordinates}&z=14&ie=UTF8&output=embed`);
+	const params = {
+		q: encodeURIComponent(coordinates),
+		key: API_KEY,
+		zoom: 14,
+		region: 'UA',
+	};
+	document.querySelector('.map-frame').setAttribute(
+		'src',
+		`https://www.google.com/maps/embed/v1/place?${Object.keys(params)
+			.map((key) => `${key}=${params[key]}`)
+			.join('&')}`
+	);
+	// .setAttribute('src', `https://maps.google.com/maps?q=${coordinates}&z=14&ie=UTF8&output=embed`);
 };
 
 /**
