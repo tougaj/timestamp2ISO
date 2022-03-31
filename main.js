@@ -7,6 +7,7 @@ $(function () {
 	$('#btnReset').on('click', resetToCurrentDateTime);
 	$('#formLat input[name]').add('#formLon input[name]').on('change', onDegreeChange);
 	$('.btn-copy-to-clipboard').on('click', copyInputToClipboard);
+	$('#editDegreeNumeric').on('change', onEditDegreeNumericChange);
 	resetToCurrentDateTime();
 	onDegreeChange();
 });
@@ -66,19 +67,7 @@ const onDegreeChange = () => {
 		getDecimalDegree(document.getElementById('formLon')),
 	].join(', ');
 	document.getElementById('editDegreeNumeric').value = coordinates;
-	const params = {
-		q: encodeURIComponent(coordinates),
-		key: API_KEY,
-		zoom: 14,
-		region: 'UA',
-	};
-	document.querySelector('.map-frame').setAttribute(
-		'src',
-		`https://www.google.com/maps/embed/v1/place?${Object.keys(params)
-			.map((key) => `${key}=${params[key]}`)
-			.join('&')}`
-	);
-	// .setAttribute('src', `https://maps.google.com/maps?q=${coordinates}&z=14&ie=UTF8&output=embed`);
+	updateDegreesFromCoordinates(coordinates);
 };
 
 /**
@@ -95,4 +84,43 @@ function copyInputToClipboard() {
 	setTimeout(() => button.toggleClass(classForToggle), timeout);
 
 	new bootstrap.Toast(document.getElementById('liveToast'), { delay: timeout }).show();
+}
+
+function onEditDegreeNumericChange() {
+	updateDegreesFromCoordinates($(this).val());
+}
+
+const getHumanNumber = (n, maximumFractionDigits = 0) => n.toLocaleString('en-US', {
+	minimumIntegerDigits: 2,
+	maximumFractionDigits});
+
+const updateDegreesFromCoordinates = (coordinates) => {
+	const getDegreeFromDecimal = (dec, suffix) => {
+		const degrees = Math.floor(dec);
+		let rest = dec-degrees;
+		const minutes = Math.floor(rest*60);
+		rest = rest*60 - minutes;
+		const seconds = rest*60;
+		return `${degrees}°${getHumanNumber(minutes)}'${getHumanNumber(seconds, 1)}"${suffix}`;
+	}
+
+	const coords = coordinates.split(/[,\s]+/i).map(Number).filter(val => !isNaN(val));
+	if (coords.length !== 2) return;
+	const degree = getDegreeFromDecimal(coords[0], 'N')+' '+getDegreeFromDecimal(coords[1], 'E');
+
+	document.querySelector('#editDegree').value = degree;
+
+	const params = {
+		q: encodeURIComponent(coordinates),
+		key: API_KEY,
+		zoom: 14,
+		region: 'UA',
+	};
+	document.querySelector('.map-frame').setAttribute(
+		'src',
+		`https://www.google.com/maps/embed/v1/place?${Object.keys(params)
+			.map((key) => `${key}=${params[key]}`)
+			.join('&')}`
+	);
+	// .setAttribute('src', `https://maps.google.com/maps?q=${coordinates}&z=14&ie=UTF8&output=embed`);
 }
