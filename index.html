@@ -157,9 +157,28 @@
 						<label for="editDegreeNumeric" class="form-label">Десяткові координати</label>
 						<div class="input-group">
 							<input
-								readonly
 								type="text"
 								id="editDegreeNumeric"
+								class="form-control"
+								value="0"
+								autocomplete="off"
+							/>
+							<button
+								class="btn btn-outline-secondary btn-copy-to-clipboard"
+								title="Копіювати в буфер обміну"
+								tabindex="-1"
+							>
+								<i class="bi bi-files"></i>
+							</button>
+						</div>
+					</div>
+					<div class="mt-3">
+						<label for="editDegree" class="form-label">Координати в градусах</label>
+						<div class="input-group">
+							<input
+								readonly
+								type="text"
+								id="editDegree"
 								class="form-control"
 								value="0"
 								autocomplete="off"
