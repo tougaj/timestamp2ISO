@@ -90,9 +90,15 @@ function onEditDegreeNumericChange() {
 	updateDegreesFromCoordinates($(this).val());
 }
 
-const getHumanNumber = (n, maximumFractionDigits = 0) => n.toLocaleString('en-US', {
+const getHumanNumber = (n, maximumFractionDigits = 1) => n.toLocaleString('en-US', {
 	minimumIntegerDigits: 2,
 	maximumFractionDigits});
+
+const updateDegreeForm = (form, degrees, minutes, seconds) => {
+	form['degrees'].value = degrees;
+	form['minutes'].value = minutes;
+	form['seconds'].value = Math.round(seconds);
+}
 
 const updateDegreesFromCoordinates = (coordinates) => {
 	const getDegreeFromDecimal = (dec, suffix) => {
@@ -101,7 +107,8 @@ const updateDegreesFromCoordinates = (coordinates) => {
 		const minutes = Math.floor(rest*60);
 		rest = rest*60 - minutes;
 		const seconds = rest*60;
-		return `${degrees}°${getHumanNumber(minutes)}'${getHumanNumber(seconds, 1)}"${suffix}`;
+		updateDegreeForm(document.querySelector(suffix === 'N' ? '#formLat' : '#formLon'), degrees, minutes, seconds);
+		return `${degrees}°${getHumanNumber(minutes)}'${getHumanNumber(seconds)}"${suffix}`;
 	}
 
 	const coords = coordinates.split(/[,\s]+/i).map(Number).filter(val => !isNaN(val));
