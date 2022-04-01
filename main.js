@@ -55,10 +55,7 @@ const getDecimalDegree = (form) =>
 	).toLocaleString('en-US', { maximumFractionDigits: 8 });
 
 /**
- * The function `onDegreeChange` is called when the user changes the degree values in the form.
- * It uses the `getDecimalDegree` function to convert the degree values to decimal degrees,
- * and then it uses the `setAttribute` method to set the `src` attribute of the `iframe` element to the
- * Google Maps URL
+ * It takes the coordinates from the form and converts them to a string.
  */
 const onDegreeChange = () => {
 	// const coordinates = '50.43333333, 30.5'; // TODO: remove this after debug
@@ -86,34 +83,67 @@ function copyInputToClipboard() {
 	new bootstrap.Toast(document.getElementById('liveToast'), { delay: timeout }).show();
 }
 
+/**
+ * This function is called when the user changes the value of the degree input box.
+ * It updates the minutes and seconds input boxes to reflect the new degrees
+ */
 function onEditDegreeNumericChange() {
 	updateDegreesFromCoordinates($(this).val());
 }
 
-const getHumanNumber = (n, maximumFractionDigits = 1) => n.toLocaleString('en-US', {
-	minimumIntegerDigits: 2,
-	maximumFractionDigits});
+/**
+ * `getHumanNumber` returns a string representation of a number with a maximum of
+ * `maximumFractionDigits` decimal places
+ * @param n - The number to format.
+ * @param [maximumFractionDigits=1] - The maximum number of digits after the decimal point.
+ */
+const getHumanNumber = (n, maximumFractionDigits = 1) =>
+	n.toLocaleString('en-US', {
+		minimumIntegerDigits: 2,
+		maximumFractionDigits,
+	});
 
+/**
+ * Update the form fields with the given values
+ * @param form - The form object that we're updating.
+ * @param degrees - The degrees of the coordinate.
+ * @param minutes - The number of minutes to add to the degrees.
+ * @param seconds - The number of seconds to add to the degree.
+ */
 const updateDegreeForm = (form, degrees, minutes, seconds) => {
 	form['degrees'].value = degrees;
 	form['minutes'].value = minutes;
 	form['seconds'].value = Math.round(seconds);
-}
+};
 
+/**
+ * It takes a decimal degree value and converts it to a human readable string
+ * @param coordinates - The coordinates to search for.
+ * @returns Nothing.
+ */
 const updateDegreesFromCoordinates = (coordinates) => {
+	/**
+	 * It takes a decimal degree value and converts it to a human readable string
+	 * @param dec - the decimal value of the degree
+	 * @param suffix - N or S for latitude, E or W for longitude
+	 * @returns a string that represents the degree, minutes, and seconds of the decimal number.
+	 */
 	const getDegreeFromDecimal = (dec, suffix) => {
 		const degrees = Math.floor(dec);
-		let rest = dec-degrees;
-		const minutes = Math.floor(rest*60);
-		rest = rest*60 - minutes;
-		const seconds = rest*60;
+		let rest = dec - degrees;
+		const minutes = Math.floor(rest * 60);
+		rest = rest * 60 - minutes;
+		const seconds = rest * 60;
 		updateDegreeForm(document.querySelector(suffix === 'N' ? '#formLat' : '#formLon'), degrees, minutes, seconds);
 		return `${degrees}°${getHumanNumber(minutes)}'${getHumanNumber(seconds)}"${suffix}`;
-	}
+	};
 
-	const coords = coordinates.split(/[,\s]+/i).map(Number).filter(val => !isNaN(val));
+	const coords = coordinates
+		.split(/[,\s]+/i)
+		.map(Number)
+		.filter((val) => !isNaN(val));
 	if (coords.length !== 2) return;
-	const degree = getDegreeFromDecimal(coords[0], 'N')+' '+getDegreeFromDecimal(coords[1], 'E');
+	const degree = getDegreeFromDecimal(coords[0], 'N') + ' ' + getDegreeFromDecimal(coords[1], 'E');
 
 	document.querySelector('#editDegree').value = degree;
 
@@ -130,4 +160,4 @@ const updateDegreesFromCoordinates = (coordinates) => {
 			.join('&')}`
 	);
 	// .setAttribute('src', `https://maps.google.com/maps?q=${coordinates}&z=14&ie=UTF8&output=embed`);
-}
+};
