@@ -131,9 +131,13 @@ const updateDegreesFromCoordinates = (coordinates) => {
 	const getDegreeFromDecimal = (dec, suffix) => {
 		const degrees = Math.floor(dec);
 		let rest = dec - degrees;
-		const minutes = Math.floor(rest * 60);
+		let minutes = Math.floor(rest * 60);
 		rest = rest * 60 - minutes;
-		const seconds = rest * 60;
+		let seconds = Math.round(rest * 6000) / 100;
+		if (seconds === 60) {
+			minutes++;
+			seconds = 0;
+		}
 		updateDegreeForm(document.querySelector(suffix === 'N' ? '#formLat' : '#formLon'), degrees, minutes, seconds);
 		return `${degrees}°${getHumanNumber(minutes)}'${getHumanNumber(seconds)}"${suffix}`;
 	};
