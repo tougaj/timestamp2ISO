@@ -10,6 +10,7 @@ $(function () {
 	$('#editDegreeNumeric').on('change', onEditDegreeNumericChange);
 	resetToCurrentDateTime();
 	onDegreeChange();
+	updateWarDuration();
 });
 
 /**
@@ -164,4 +165,14 @@ const updateDegreesFromCoordinates = (coordinates) => {
 			.join('&')}`
 	);
 	// .setAttribute('src', `https://maps.google.com/maps?q=${coordinates}&z=14&ie=UTF8&output=embed`);
+};
+
+const mWarStart = moment('2022-02-24T03:00:00.000Z');
+const updateWarDuration = () => {
+	const mCurrent = moment();
+	const warDuration = moment.duration(mCurrent.diff(mWarStart));
+	const sDuration = `${warDuration.months()} міс. ${warDuration.days()} д. ${warDuration.hours()} год. ${warDuration.minutes()} хв.`;
+	document.querySelector('.war-duration__duration').innerText = sDuration;
+	document.querySelector('.war-duration__days').innerText = Math.ceil(warDuration.asDays());
+	setTimeout(updateWarDuration, 60000 - mCurrent.get('seconds') * 1000 + mCurrent.get('milliseconds') + 1);
 };
