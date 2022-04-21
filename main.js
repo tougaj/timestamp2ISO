@@ -1,4 +1,12 @@
 const API_KEY = 'AIzaSyDBQj8I0ElYPaXxgInMT3Ped3BS9blqy8Q';
+const ALERT_X_API_KEY = '86a7a81dad35ff830cb6e8d4d346434c48c0c514';
+const ALERT_UPDATE_INTERVAL = 20 * 1000;
+
+try {
+	moment.locale(navigator.language);
+} catch (error) {
+	moment.locale('uk-UA');
+}
 
 $(function () {
 	$('#editDate').on('change', printUTCDate);
@@ -11,6 +19,10 @@ $(function () {
 	resetToCurrentDateTime();
 	onDegreeChange();
 	updateWarDuration();
+
+	// Оновлення повітряних тривог
+	updateRaidAlert();
+	setInterval(updateRaidAlert, ALERT_UPDATE_INTERVAL);
 });
 
 /**
@@ -171,8 +183,68 @@ const mWarStart = moment('2022-02-24T03:00:00.000Z');
 const updateWarDuration = () => {
 	const mCurrent = moment();
 	const warDuration = moment.duration(mCurrent.diff(mWarStart));
-	const sDuration = `${warDuration.months()} міс. ${warDuration.days()} д. ${warDuration.hours()} год. ${warDuration.minutes()} хв.`;
+	const sDuration = getHumanizeDuration(warDuration);
+	// const sDuration = `${warDuration.months()} міс. ${warDuration.days()} д. ${warDuration.hours()} год. ${warDuration.minutes()} хв.`;
 	document.querySelector('.war-duration__duration').innerText = sDuration;
 	document.querySelector('.war-duration__days').innerText = Math.ceil(warDuration.asDays());
-	setTimeout(updateWarDuration, 60000 - mCurrent.get('seconds') * 1000 + mCurrent.get('milliseconds') + 1);
+	setTimeout(updateWarDuration, 60000 - (mCurrent.get('seconds') * 1000 + mCurrent.get('milliseconds')) + 1);
+};
+
+const updateRaidAlert = () => {
+	fetch('https://alerts.com.ua/api/states', {
+		headers: {
+			'X-API-Key': ALERT_X_API_KEY,
+		},
+	})
+		.then((response) => response.json())
+		.then((data) => {
+			const regionsWithAlerts = data.states.filter((state) => state.alert);
+			regionsWithAlerts.sort((a, b) => -a.changed.localeCompare(b.changed));
+			const now = moment();
+			const container = $('.alarm__container').empty();
+			$('.alarm__date').text(`(станом на ${moment(data.last_update).format('L LT')})`);
+			regionsWithAlerts.forEach(({ name, id, changed }) => {
+				const m = moment(changed);
+				duration = moment.duration(now.diff(m));
+				const durationInMinutes = duration.asMinutes();
+				const containerColorClass =
+					durationInMinutes < 120
+						? durationInMinutes < 10
+							? 'alarm__region-container--warning'
+							: durationInMinutes < 60
+							? 'alarm__region-container--danger alarm__light_text'
+							: 'alarm__region-container--info'
+						: '';
+				const sStarted = m.format('LT L');
+				$(
+					`<div class="alarm__region-container rounded px-2 py-1 ${containerColorClass}" id="alarmRegion${id}"></div>`
+				)
+					.append(`<div class="alarm__region-title fs-5">${name}</div>`)
+					.append(
+						$('<div class="d-flex justify-content-between align-items-end"></div>')
+							.append(
+								`<div class="alarm__duration text-nowrap"><i class="bi bi-clock"></i> Триває ${getHumanizeDuration(
+									duration
+								)}</div>
+					`
+							)
+							.append(
+								`<div class="alarm__started text-truncate ms-1 text-small" title="Оголошено в ${sStarted}"><i class="bi bi-megaphone"></i> ${sStarted}</div>`
+							)
+					)
+					.appendTo(container);
+			});
+		});
+};
+
+const getHumanizeDuration = (duration, withSeconds = false) => {
+	let result = '';
+	if (duration.months() !== 0) result += `${duration.months()} міс. `;
+	if (duration.days() !== 0) result += `${duration.days()} д. `;
+	if (duration.hours() !== 0) result += `${duration.hours()} год. `;
+	if (duration.minutes() !== 0) result += `${duration.minutes()} хв. `;
+	if (withSeconds && duration.seconds() !== 0) {
+		result += `${duration.seconds()} с. `;
+	}
+	return result || 'декілька секунд';
 };
