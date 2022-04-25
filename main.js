@@ -186,7 +186,7 @@ const updateWarDuration = () => {
 	const sDuration = getHumanizeDuration(warDuration);
 	// const sDuration = `${warDuration.months()} міс. ${warDuration.days()} д. ${warDuration.hours()} год. ${warDuration.minutes()} хв.`;
 	document.querySelector('.war-duration__duration').innerText = sDuration;
-	document.querySelector('.war-duration__days').innerText = Math.ceil(warDuration.asDays());
+	document.querySelector('.war-duration__days').innerText = `${Math.ceil(warDuration.asDays())} добу`;
 	setTimeout(updateWarDuration, 60000 - (mCurrent.get('seconds') * 1000 + mCurrent.get('milliseconds')) + 1);
 };
 
