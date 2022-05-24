@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="uk">
 	<head>
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-6SH0GH855K"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				dataLayer.push(arguments);
+			}
+			gtag('js', new Date());
+
+			gtag('config', 'G-6SH0GH855K');
+		</script>
+
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Дрібні корисники</title>
@@ -23,18 +35,6 @@
 		/>
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" />
 		<link rel="stylesheet" href="./style.css" />
-
-		<!-- Global site tag (gtag.js) - Google Analytics -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=G-6SH0GH855K"></script>
-		<script>
-			window.dataLayer = window.dataLayer || [];
-			function gtag() {
-				dataLayer.push(arguments);
-			}
-			gtag('js', new Date());
-
-			gtag('config', 'G-6SH0GH855K');
-		</script>
 	</head>
 	<body>
 		<div class="container">
@@ -210,10 +210,13 @@
 						<div class="">
 							<i class="bi bi-megaphone"></i> Оголошені повітряні тривоги
 							<span class="alarm__date text-muted text-small"></span>
+							<a href="https://alerts.in.ua/" target="_blank" title="Карта повітряних тривог України"
+								><i class="bi bi-box-arrow-up-right"></i
+							></a>
 						</div>
-						<a href="https://alerts.in.ua/" target="_blank" title="Карта повітряних тривог України"
-							><i class="bi bi-box-arrow-up-right"></i
-						></a>
+						<button class="btn btn-outline-secondary disabled" id="btnAlertAlarmEnable">
+							<i class="bi bi-bell-fill"></i> Сповіщати про тривоги
+						</button>
 					</h2>
 				</div>
 				<div class="col-12 alarm__container gap-2"></div>

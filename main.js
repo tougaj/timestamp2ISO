@@ -1,6 +1,9 @@
 const API_KEY = 'AIzaSyDBQj8I0ElYPaXxgInMT3Ped3BS9blqy8Q';
 const ALERT_X_API_KEY = '86a7a81dad35ff830cb6e8d4d346434c48c0c514';
 const ALERT_UPDATE_INTERVAL = 20 * 1000;
+const state = {
+	alerts: new Set(),
+};
 
 try {
 	moment.locale(navigator.language);
@@ -16,6 +19,8 @@ $(function () {
 	$('#formLat input[name]').add('#formLon input[name]').on('change', onDegreeChange);
 	$('.btn-copy-to-clipboard').on('click', copyInputToClipboard);
 	$('#editDegreeNumeric').on('change', onEditDegreeNumericChange);
+	$('#btnAlertAlarmEnable').on('click', btnAlertAlarmEnableClick);
+	updateAlertAlarmEnableButton();
 	resetToCurrentDateTime();
 	onDegreeChange();
 	updateWarDuration();
@@ -94,6 +99,7 @@ function copyInputToClipboard() {
 	setTimeout(() => button.toggleClass(classForToggle), timeout);
 
 	new bootstrap.Toast(document.getElementById('liveToast'), { delay: timeout }).show();
+	// notifyInit();
 }
 
 /**
@@ -234,7 +240,40 @@ const updateRaidAlert = () => {
 					)
 					.appendTo(container);
 			});
+			if (Notify.allow()) notifyAlerts(regionsWithAlerts.map((state) => state.name));
 		});
+};
+
+const notifyAlerts = (newAlerts) => {
+	function difference(setA, setB) {
+		var _difference = new Set(setA);
+		for (var elem of setB) {
+			_difference.delete(elem);
+		}
+		return _difference;
+	}
+
+	const oldAlertSet = state.alerts;
+	const newAlertSet = new Set(newAlerts);
+	const addedALerts = difference(newAlertSet, oldAlertSet);
+	const removedAlerts = difference(oldAlertSet, newAlertSet);
+
+	state.alerts = newAlertSet;
+	if (addedALerts.size === 0 && removedAlerts.size === 0) return;
+
+	const title = [
+		addedALerts.size === 0 ? undefined : `оголошені 🔴 ${addedALerts.size}`,
+		removedAlerts.size === 0 ? undefined : `скасовані 🟢 ${removedAlerts.size}`,
+	]
+		.filter(Boolean)
+		.join(', ');
+	Notify.show({
+		title: `Повітряні тривоги: ${title}`,
+		body: [...addedALerts]
+			.map((s) => `🔴 ${s}`)
+			.concat([...removedAlerts].map((s) => `🟢 ${s}`))
+			.join('\n'),
+	});
 };
 
 const getHumanizeDuration = (duration, withSeconds = false) => {
@@ -247,4 +286,43 @@ const getHumanizeDuration = (duration, withSeconds = false) => {
 		result += `${duration.seconds()} с. `;
 	}
 	return result || 'декілька секунд';
+};
+
+const btnAlertAlarmEnableClick = () => {
+	Notify.requestPermission();
+};
+
+const updateAlertAlarmEnableButton = () => {
+	if (Notification.permission === 'default') $('#btnAlertAlarmEnable').removeClass('disabled');
+	else $('#btnAlertAlarmEnable').addClass('disabled');
+};
+1;
+const Notify = {
+	// icon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/325/warning_26a0-fe0f.png',
+	// icon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/313/bomb_1f4a3.png',
+	defaultIcon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/313/megaphone_1f4e3.png',
+	// icon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/325/skull-and-crossbones_2620-fe0f.png',
+	// icon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/313/collision_1f4a5.png',
+	defaultTimeout: 10000,
+
+	requestPermission: function () {
+		if (!('Notification' in window)) {
+			return;
+		}
+		Notification.requestPermission().then((permission) => {
+			updateAlertAlarmEnableButton();
+		});
+	},
+
+	allow: function () {
+		return Notification.permission === 'granted';
+	},
+
+	show: function ({ title = 'Оповіщення', body, icon = Notify.defaultIcon, timeout = Notify.defaultTimeout }) {
+		const notification = new Notification(title, {
+			body,
+			icon,
+		});
+		setTimeout(() => notification.close(), timeout);
+	},
 };
