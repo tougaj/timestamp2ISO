@@ -81,3 +81,19 @@ body {
 .alarm__started {
 	color: var(--alarm-secondary-color);
 }
+
+@keyframes keyframe-bounce {
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.5);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+.animation-bounce {
+	animation: keyframe-bounce 2s infinite linear;
+	display: inline-block;
+}

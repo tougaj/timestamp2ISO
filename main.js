@@ -161,6 +161,7 @@ const updateDegreesFromCoordinates = (coordinates) => {
 		return `${degrees}°${getHumanNumber(minutes)}'${getHumanNumber(seconds)}"${suffix}`;
 	};
 
+	// coords - масив з координатами в вигляді десяткових частин градусів [lat, lon]
 	const coords = coordinates
 		.split(/[,\s]+/i)
 		.map(Number)
@@ -182,7 +183,28 @@ const updateDegreesFromCoordinates = (coordinates) => {
 			.map((key) => `${key}=${params[key]}`)
 			.join('&')}`
 	);
+	updatePlaceFromCoordinates(coords);
 	// .setAttribute('src', `https://maps.google.com/maps?q=${coordinates}&z=14&ie=UTF8&output=embed`);
+};
+
+const updatePlaceFromCoordinates = (coordinates) => {
+	fetch(
+		`https://nominatim.openstreetmap.org/reverse.php?lat=${coordinates[0]}&lon=${coordinates[1]}&zoom=18&format=jsonv2`
+	)
+		.then((response) => {
+			if (!response.ok) throw new Error(response.statusText);
+			return response.json();
+		})
+		.then((r) => {
+			if (r.error) throw new Error(r.error);
+			$('#placeByPoint').text(r.display_name);
+			$('#placeByPointIcon').addClass('animation-bounce');
+			setTimeout(() => $('#placeByPointIcon').removeClass('animation-bounce'), 2000);
+		})
+		.catch((error) => {
+			$('#placeByPoint').text('Місце не визначено');
+			console.error(error);
+		});
 };
 
 const mWarStart = moment('2022-02-24T03:00:00.000Z');
