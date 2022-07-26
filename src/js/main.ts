@@ -208,7 +208,7 @@ const updateDegreesFromCoordinates = (coordinates: string) => {
 	// const p = new LatLon(0, 0);
 	// console.log(p.toUtm().toMgrs().toString());
 
-	const params = {
+	const params: { [key: string]: any } = {
 		q: encodeURIComponent(coordinates),
 		key: API_KEY,
 		zoom: 14,
@@ -217,7 +217,7 @@ const updateDegreesFromCoordinates = (coordinates: string) => {
 	(document.querySelector('.map-frame') as HTMLIFrameElement).setAttribute(
 		'src',
 		`https://www.google.com/maps/embed/v1/place?${Object.keys(params)
-			.map((key) => `${key}=${params.key}`)
+			.map((key) => `${key}=${params[key]}`)
 			.join('&')}`
 	);
 	updatePlaceFromCoordinates(coords);
@@ -225,8 +225,6 @@ const updateDegreesFromCoordinates = (coordinates: string) => {
 };
 
 const updatePlaceFromCoordinates = (coordinates: number[]) => {
-	console.log(coordinates);
-
 	fetch(
 		`https://nominatim.openstreetmap.org/reverse.php?lat=${coordinates[0]}&lon=${coordinates[1]}&zoom=18&format=jsonv2`
 	)
