@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 const API_KEY = 'AIzaSyDBQj8I0ElYPaXxgInMT3Ped3BS9blqy8Q';
 const ALERT_X_API_KEY = '86a7a81dad35ff830cb6e8d4d346434c48c0c514';
 const ALERT_UPDATE_INTERVAL = 20 * 1000;
@@ -233,7 +235,7 @@ const updateRaidAlert = () => {
 			$('.alarm__date').text(`(станом на ${moment(data.last_update).format('L LT')})`);
 			regionsWithAlerts.forEach(({ name, id, changed }) => {
 				const m = moment(changed);
-				duration = moment.duration(now.diff(m));
+				const duration = moment.duration(now.diff(m));
 				const durationInMinutes = duration.asMinutes();
 				const containerColorClass =
 					durationInMinutes < 120
