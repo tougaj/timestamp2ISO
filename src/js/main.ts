@@ -121,7 +121,7 @@ function onEditDegreeNumericChange(this: JQuery) {
 }
 
 function onEditMgrsChange(this: JQuery) {
-	const mgrs = Mgrs.parse($(this).val() as string);
+	const mgrs = Mgrs.parse(($(this).val() as string).toUpperCase());
 	const latlon = mgrs.toUtm().toLatLon();
 	updateDegreesFromCoordinates(`${latlon._lat}, ${latlon._lon}`);
 }
