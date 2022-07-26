@@ -1,9 +1,12 @@
+import Mgrs, { LatLon } from 'geodesy/mgrs';
 import moment from 'moment';
+
+var bootstrap: any;
 
 const API_KEY = 'AIzaSyDBQj8I0ElYPaXxgInMT3Ped3BS9blqy8Q';
 const ALERT_X_API_KEY = '86a7a81dad35ff830cb6e8d4d346434c48c0c514';
 const ALERT_UPDATE_INTERVAL = 20 * 1000;
-const state = {
+const state: IGlobalState = {
 	alerts: new Set(),
 };
 
@@ -16,11 +19,12 @@ try {
 $(function () {
 	$('#editDate').on('change', printUTCDate);
 	$('#editTime').on('change', printUTCDate);
-	$('#formTimeStamp').on('submit', onTimeStampSubmit);
+	($('#formTimeStamp') as any).on('submit', onTimeStampSubmit);
 	$('#btnReset').on('click', resetToCurrentDateTime);
 	$('#formLat input[name]').add('#formLon input[name]').on('change', onDegreeChange);
 	$('.btn-copy-to-clipboard').on('click', copyInputToClipboard);
 	$('#editDegreeNumeric').on('change', onEditDegreeNumericChange);
+	$('#editMgrs').on('change', onEditMgrsChange);
 	$('#btnAlertAlarmEnable').on('click', btnAlertAlarmEnableClick);
 	updateAlertAlarmEnableButton();
 	resetToCurrentDateTime();
@@ -46,7 +50,7 @@ const printUTCDate = () => {
  * Prints the current date and time in UTC format
  * @param event - The event object that was triggered.
  */
-const onTimeStampSubmit = (event) => {
+const onTimeStampSubmit = (event: MouseEvent) => {
 	event.preventDefault();
 	printUTCDate();
 };
@@ -67,34 +71,38 @@ const resetToCurrentDateTime = () => {
  * return the decimal degree value of the coordinates
  * @param form - The form object that we're working with.
  */
-const getDecimalDegree = (form) =>
-	(
-		parseInt(form['degrees'].value) +
-		parseInt(form['minutes'].value) / 60 +
-		parseInt(form['seconds'].value) / 3600
-	).toLocaleString('en-US', { maximumFractionDigits: 8 });
+const getDecimalDegree = (form: HTMLFormElement) => {
+	if (!form) return '0';
+	const originalDegree = parseInt(form['degrees'].value);
+	const isNegative = originalDegree < 0;
+	const absDegree = Math.abs(originalDegree);
+	const minutes = parseInt(form['minutes'].value) / 60;
+	const seconds = parseInt(form['seconds'].value) / 3600;
+	return ((absDegree + minutes + seconds) * (isNegative ? -1 : 1)).toLocaleString('en-US', {
+		maximumFractionDigits: 8,
+	});
+};
 
 /**
  * It takes the coordinates from the form and converts them to a string.
  */
 const onDegreeChange = () => {
-	// const coordinates = '50.43333333, 30.5'; // TODO: remove this after debug
+	// const coordinates = '50.43333333, 30.5';
 	const coordinates = [
-		getDecimalDegree(document.getElementById('formLat')),
-		getDecimalDegree(document.getElementById('formLon')),
+		getDecimalDegree(document.getElementById('formLat') as HTMLFormElement),
+		getDecimalDegree(document.getElementById('formLon') as HTMLFormElement),
 	].join(', ');
-	document.getElementById('editDegreeNumeric').value = coordinates;
 	updateDegreesFromCoordinates(coordinates);
 };
 
 /**
  * It copies the value of the input to the clipboard.
  */
-function copyInputToClipboard() {
+function copyInputToClipboard(this: JQuery) {
 	const classForToggle = 'btn-outline-secondary btn-outline-success';
 	const timeout = 1000;
 	const button = $(this);
-	const input = button.siblings('input')[0];
+	const input = button.siblings('input')[0] as HTMLButtonElement;
 	navigator.clipboard.writeText(input.value);
 
 	button.toggleClass(classForToggle);
@@ -108,8 +116,14 @@ function copyInputToClipboard() {
  * This function is called when the user changes the value of the degree input box.
  * It updates the minutes and seconds input boxes to reflect the new degrees
  */
-function onEditDegreeNumericChange() {
-	updateDegreesFromCoordinates($(this).val());
+function onEditDegreeNumericChange(this: JQuery) {
+	updateDegreesFromCoordinates($(this).val() as string);
+}
+
+function onEditMgrsChange(this: JQuery) {
+	const mgrs = Mgrs.parse($(this).val() as string);
+	const latlon = mgrs.toUtm().toLatLon();
+	updateDegreesFromCoordinates(`${latlon._lat}, ${latlon._lon}`);
 }
 
 /**
@@ -118,7 +132,7 @@ function onEditDegreeNumericChange() {
  * @param n - The number to format.
  * @param [maximumFractionDigits=1] - The maximum number of digits after the decimal point.
  */
-const getHumanNumber = (n, maximumFractionDigits = 1) =>
+const getHumanNumber = (n: number, maximumFractionDigits = 1) =>
 	n.toLocaleString('en-US', {
 		minimumIntegerDigits: 2,
 		maximumFractionDigits,
@@ -131,7 +145,8 @@ const getHumanNumber = (n, maximumFractionDigits = 1) =>
  * @param minutes - The number of minutes to add to the degrees.
  * @param seconds - The number of seconds to add to the degree.
  */
-const updateDegreeForm = (form, degrees, minutes, seconds) => {
+const updateDegreeForm = (form: HTMLFormElement | null, degrees: number, minutes: number, seconds: number) => {
+	if (!form) return;
 	form['degrees'].value = degrees;
 	form['minutes'].value = minutes;
 	form['seconds'].value = Math.round(seconds);
@@ -142,14 +157,17 @@ const updateDegreeForm = (form, degrees, minutes, seconds) => {
  * @param coordinates - The coordinates to search for.
  * @returns Nothing.
  */
-const updateDegreesFromCoordinates = (coordinates) => {
+const updateDegreesFromCoordinates = (coordinates: string) => {
 	/**
 	 * It takes a decimal degree value and converts it to a human readable string
 	 * @param dec - the decimal value of the degree
 	 * @param suffix - N or S for latitude, E or W for longitude
 	 * @returns a string that represents the degree, minutes, and seconds of the decimal number.
 	 */
-	const getDegreeFromDecimal = (dec, suffix) => {
+	const getDegreeFromDecimal = (decOriginal: number, suffix: TWorldDirection) => {
+		const isNegative = decOriginal < 0;
+		const dec = Math.abs(decOriginal);
+
 		const degrees = Math.floor(dec);
 		let rest = dec - degrees;
 		let minutes = Math.floor(rest * 60);
@@ -159,8 +177,15 @@ const updateDegreesFromCoordinates = (coordinates) => {
 			minutes++;
 			seconds = 0;
 		}
-		updateDegreeForm(document.querySelector(suffix === 'N' ? '#formLat' : '#formLon'), degrees, minutes, seconds);
-		return `${degrees}°${getHumanNumber(minutes)}'${getHumanNumber(seconds)}"${suffix}`;
+		updateDegreeForm(
+			document.querySelector(['N', 'S'].indexOf(suffix) !== -1 ? '#formLat' : '#formLon'),
+			degrees * (isNegative ? -1 : 1),
+			minutes,
+			seconds
+		);
+		return `${degrees}°${getHumanNumber(minutes)}'${getHumanNumber(seconds)}"${
+			isNegative ? (suffix === 'N' ? 'S' : 'W') : suffix
+		}`;
 	};
 
 	// coords - масив з координатами в вигляді десяткових частин градусів [lat, lon]
@@ -171,7 +196,17 @@ const updateDegreesFromCoordinates = (coordinates) => {
 	if (coords.length !== 2) return;
 	const degree = getDegreeFromDecimal(coords[0], 'N') + ' ' + getDegreeFromDecimal(coords[1], 'E');
 
-	document.querySelector('#editDegree').value = degree;
+	(document.getElementById('editDegreeNumeric') as HTMLInputElement).value = coordinates;
+
+	(document.querySelector('#editDegree') as HTMLInputElement).value = degree;
+
+	(document.querySelector('#editMgrs') as HTMLInputElement).value = new LatLon(coords[0], coords[1])
+		.toUtm()
+		.toMgrs()
+		.toString();
+
+	// const p = new LatLon(0, 0);
+	// console.log(p.toUtm().toMgrs().toString());
 
 	const params = {
 		q: encodeURIComponent(coordinates),
@@ -179,17 +214,19 @@ const updateDegreesFromCoordinates = (coordinates) => {
 		zoom: 14,
 		region: 'UA',
 	};
-	document.querySelector('.map-frame').setAttribute(
+	(document.querySelector('.map-frame') as HTMLIFrameElement).setAttribute(
 		'src',
 		`https://www.google.com/maps/embed/v1/place?${Object.keys(params)
-			.map((key) => `${key}=${params[key]}`)
+			.map((key) => `${key}=${params.key}`)
 			.join('&')}`
 	);
 	updatePlaceFromCoordinates(coords);
 	// .setAttribute('src', `https://maps.google.com/maps?q=${coordinates}&z=14&ie=UTF8&output=embed`);
 };
 
-const updatePlaceFromCoordinates = (coordinates) => {
+const updatePlaceFromCoordinates = (coordinates: number[]) => {
+	console.log(coordinates);
+
 	fetch(
 		`https://nominatim.openstreetmap.org/reverse.php?lat=${coordinates[0]}&lon=${coordinates[1]}&zoom=18&format=jsonv2`
 	)
@@ -215,8 +252,10 @@ const updateWarDuration = () => {
 	const warDuration = moment.duration(mCurrent.diff(mWarStart));
 	const sDuration = getHumanizeDuration(warDuration);
 	// const sDuration = `${warDuration.months()} міс. ${warDuration.days()} д. ${warDuration.hours()} год. ${warDuration.minutes()} хв.`;
-	document.querySelector('.war-duration__duration').innerText = sDuration;
-	document.querySelector('.war-duration__days').innerText = `${Math.ceil(warDuration.asDays())} добу`;
+	(document.querySelector('.war-duration__duration') as HTMLDivElement).innerText = sDuration;
+	(document.querySelector('.war-duration__days') as HTMLDivElement).innerText = `${Math.ceil(
+		warDuration.asDays()
+	)} добу`;
 	setTimeout(updateWarDuration, 60000 - (mCurrent.get('seconds') * 1000 + mCurrent.get('milliseconds')) + 1);
 };
 
@@ -227,7 +266,7 @@ const updateRaidAlert = () => {
 		},
 	})
 		.then((response) => response.json())
-		.then((data) => {
+		.then((data: IRedAlert) => {
 			const regionsWithAlerts = data.states.filter((state) => state.alert);
 			regionsWithAlerts.sort((a, b) => -a.changed.localeCompare(b.changed));
 			const now = moment();
@@ -268,8 +307,8 @@ const updateRaidAlert = () => {
 		});
 };
 
-const notifyAlerts = (newAlerts) => {
-	function difference(setA, setB) {
+const notifyAlerts = (newAlerts: string[]) => {
+	function difference(setA: Set<string>, setB: Set<string>) {
 		var _difference = new Set(setA);
 		for (var elem of setB) {
 			_difference.delete(elem);
@@ -300,7 +339,7 @@ const notifyAlerts = (newAlerts) => {
 	});
 };
 
-const getHumanizeDuration = (duration, withSeconds = false) => {
+const getHumanizeDuration = (duration: moment.Duration, withSeconds = false) => {
 	let result = '';
 	if (duration.months() !== 0) result += `${duration.months()} міс. `;
 	if (duration.days() !== 0) result += `${duration.days()} д. `;
@@ -342,11 +381,28 @@ const Notify = {
 		return Notification.permission === 'granted';
 	},
 
-	show: function ({ title = 'Оповіщення', body, icon = Notify.defaultIcon, timeout = Notify.defaultTimeout }) {
+	show: function ({ title = 'Оповіщення', body = '', icon = Notify.defaultIcon, timeout = Notify.defaultTimeout }) {
 		const notification = new Notification(title, {
 			body,
 			icon,
 		});
 		setTimeout(() => notification.close(), timeout);
 	},
-};
+} as any;
+
+interface IGlobalState {
+	alerts: Set<string>;
+}
+
+interface IRedAlertElement {
+	id: number;
+	name: string;
+	alert: boolean;
+	changed: string;
+}
+interface IRedAlert {
+	last_update: string;
+	states: IRedAlertElement[];
+}
+
+type TWorldDirection = 'N' | 'E' | 'S' | 'W';

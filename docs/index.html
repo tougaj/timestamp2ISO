@@ -34,7 +34,7 @@
 			crossorigin="anonymous"
 		/>
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" />
-		<link rel="stylesheet" href="css/style.css" />
+		<link rel="stylesheet" href="css/style.css?ts=l626kdma" />
 	</head>
 	<body>
 		<div class="container">
@@ -90,7 +90,7 @@
 								type="number"
 								class="form-control"
 								name="degrees"
-								min="0"
+								min="-180"
 								max="180"
 								value="0"
 								autocomplete="off"
@@ -125,7 +125,7 @@
 								type="number"
 								class="form-control"
 								name="degrees"
-								min="0"
+								min="-90"
 								max="90"
 								value="0"
 								autocomplete="off"
@@ -163,6 +163,19 @@
 								value="0"
 								autocomplete="off"
 							/>
+							<button
+								class="btn btn-outline-secondary btn-copy-to-clipboard"
+								title="Копіювати в буфер обміну"
+								tabindex="-1"
+							>
+								<i class="bi bi-files"></i>
+							</button>
+						</div>
+					</div>
+					<div class="mt-3">
+						<label for="editMgrs" class="form-label">Military Grid Reference System</label>
+						<div class="input-group">
+							<input type="text" id="editMgrs" class="form-control" value="0" autocomplete="off" />
 							<button
 								class="btn btn-outline-secondary btn-copy-to-clipboard"
 								title="Копіювати в буфер обміну"
@@ -260,6 +273,6 @@
 			crossorigin="anonymous"
 			referrerpolicy="no-referrer"
 		></script> -->
-		<script src="js/main.bundle.js?ts=l620th02"></script>
+		<script src="js/main.bundle.js?ts=l626kdma"></script>
 	</body>
 </html>
