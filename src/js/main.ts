@@ -1,11 +1,12 @@
+// import Toast from 'bootstrap/js/dist/toast';
 import Mgrs, { LatLon } from 'geodesy/mgrs';
 import moment from 'moment';
-
-var bootstrap: any;
 
 const API_KEY = 'AIzaSyDBQj8I0ElYPaXxgInMT3Ped3BS9blqy8Q';
 const ALERT_X_API_KEY = '86a7a81dad35ff830cb6e8d4d346434c48c0c514';
 const ALERT_UPDATE_INTERVAL = 20 * 1000;
+const TOAST_TIMEOUT = 1000;
+
 const state: IGlobalState = {
 	alerts: new Set(),
 };
@@ -15,6 +16,8 @@ try {
 } catch (error) {
 	moment.locale('uk-UA');
 }
+
+const promiseTimeout = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 $(function () {
 	$('#editDate').on('change', printUTCDate);
@@ -95,20 +98,39 @@ const onDegreeChange = () => {
 	updateDegreesFromCoordinates(coordinates);
 };
 
+const showToast = async (text: string, className = 'bg-success text-white') => {
+	const toastsContainer = $('.toasts__container');
+	if (!toastsContainer) return;
+	const toast = $(
+		'<div id="liveToast" class="toast fade show showing" role="alert" aria-live="assertive" aria-atomic="true"></div>'
+	)
+		.append(`<div class="toast-body p-3 ${className}">${text}</div>`)
+		.appendTo(toastsContainer);
+
+	await promiseTimeout(0);
+	toast.removeClass('showing');
+	await promiseTimeout(TOAST_TIMEOUT);
+	toast.addClass('showing');
+	await promiseTimeout(500);
+	toast.remove();
+};
+
 /**
  * It copies the value of the input to the clipboard.
  */
 function copyInputToClipboard(this: JQuery) {
 	const classForToggle = 'btn-outline-secondary btn-outline-success';
-	const timeout = 1000;
 	const button = $(this);
 	const input = button.siblings('input')[0] as HTMLButtonElement;
 	navigator.clipboard.writeText(input.value);
 
 	button.toggleClass(classForToggle);
-	setTimeout(() => button.toggleClass(classForToggle), timeout);
+	setTimeout(() => button.toggleClass(classForToggle), TOAST_TIMEOUT);
 
-	new bootstrap.Toast(document.getElementById('liveToast'), { delay: timeout }).show();
+	showToast('Скопійовано до буферу обміну');
+	// const toastControl = document.getElementById('liveToast');
+	// if (!toastControl) return;
+	// new Toast(toastControl, { delay: TOAST_TIMEOUT }).show();
 	// notifyInit();
 }
 

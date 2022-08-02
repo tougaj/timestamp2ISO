@@ -18,8 +18,10 @@
   },
   "homepage": "https://github.com/tougaj/timestamp2ISO#readme",
   "devDependencies": {
+    "@types/bootstrap": "^5.2.1",
     "@types/geodesy": "^2.2.3",
     "@types/jquery": "^3.5.14",
+    "bootstrap": "^5.2.0",
     "browser-sync": "^2.27.10",
     "del": "^6.1.1",
     "gulp": "^4.0.2",

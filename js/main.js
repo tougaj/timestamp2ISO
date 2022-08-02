@@ -22,16 +22,25 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mgrs_1 = __importStar(require("geodesy/mgrs"));
 const moment_1 = __importDefault(require("moment"));
-var bootstrap;
 const API_KEY = 'AIzaSyDBQj8I0ElYPaXxgInMT3Ped3BS9blqy8Q';
 const ALERT_X_API_KEY = '86a7a81dad35ff830cb6e8d4d346434c48c0c514';
 const ALERT_UPDATE_INTERVAL = 20 * 1000;
+const TOAST_TIMEOUT = 1000;
 const state = {
     alerts: new Set(),
 };
@@ -41,6 +50,7 @@ try {
 catch (error) {
     moment_1.default.locale('uk-UA');
 }
+const promiseTimeout = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 $(function () {
     $('#editDate').on('change', printUTCDate);
     $('#editTime').on('change', printUTCDate);
@@ -94,15 +104,28 @@ const onDegreeChange = () => {
     ].join(', ');
     updateDegreesFromCoordinates(coordinates);
 };
+const showToast = (text, className = 'bg-success text-white') => __awaiter(void 0, void 0, void 0, function* () {
+    const toastsContainer = $('.toasts__container');
+    if (!toastsContainer)
+        return;
+    const toast = $('<div id="liveToast" class="toast fade show showing" role="alert" aria-live="assertive" aria-atomic="true"></div>')
+        .append(`<div class="toast-body p-3 ${className}">${text}</div>`)
+        .appendTo(toastsContainer);
+    yield promiseTimeout(0);
+    toast.removeClass('showing');
+    yield promiseTimeout(TOAST_TIMEOUT);
+    toast.addClass('showing');
+    yield promiseTimeout(500);
+    toast.remove();
+});
 function copyInputToClipboard() {
     const classForToggle = 'btn-outline-secondary btn-outline-success';
-    const timeout = 1000;
     const button = $(this);
     const input = button.siblings('input')[0];
     navigator.clipboard.writeText(input.value);
     button.toggleClass(classForToggle);
-    setTimeout(() => button.toggleClass(classForToggle), timeout);
-    new bootstrap.Toast(document.getElementById('liveToast'), { delay: timeout }).show();
+    setTimeout(() => button.toggleClass(classForToggle), TOAST_TIMEOUT);
+    showToast('Скопійовано до буферу обміну');
 }
 function onEditDegreeNumericChange() {
     updateDegreesFromCoordinates($(this).val());
