@@ -40,6 +40,7 @@
 		"webpack-stream": "^7.0.0"
 	},
 	"dependencies": {
+		"csv-reader": "^1.0.10",
 		"geodesy": "^2.4.0"
 	}
 }
