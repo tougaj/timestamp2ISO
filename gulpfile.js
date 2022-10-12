@@ -70,6 +70,10 @@ function watch() {
 	gulp.watch(['./index.html']).on('change', browserSync.reload);
 }
 
+function watchUtils() {
+	gulp.watch(paths.scripts.src, typeScripts);
+}
+
 gulp.task('sass', styles);
 gulp.task('ts', typeScripts);
 gulp.task('webpack', gulp.series(typeScripts, webpackDev));
@@ -99,6 +103,7 @@ gulp.task(
 
 let development = gulp.series(styles, typeScripts, webpackDev, watch);
 gulp.task('default', development);
+gulp.task('utils', gulp.series(typeScripts, watchUtils));
 
 function runDevWebPack(sSource, sEntry) {
 	return gulp

@@ -1,45 +1,45 @@
 {
-  "name": "timestamp2iso",
-  "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/tougaj/timestamp2ISO.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/tougaj/timestamp2ISO/issues"
-  },
-  "homepage": "https://github.com/tougaj/timestamp2ISO#readme",
-  "devDependencies": {
-    "@types/bootstrap": "^5.2.1",
-    "@types/geodesy": "^2.2.3",
-    "@types/jquery": "^3.5.14",
-    "bootstrap": "^5.2.0",
-    "browser-sync": "^2.27.10",
-    "del": "^6.1.1",
-    "gulp": "^4.0.2",
-    "gulp-autoprefixer": "^8.0.0",
-    "gulp-changed": "^4.0.3",
-    "gulp-clean-css": "^4.3.0",
-    "gulp-plumber": "^1.2.1",
-    "gulp-replace": "^1.1.3",
-    "gulp-sass": "^5.1.0",
-    "gulp-typescript": "^6.0.0-alpha.1",
-    "jquery": "^3.6.0",
-    "moment": "^2.29.4",
-    "moment-locales-webpack-plugin": "^1.2.0",
-    "sass": "^1.54.0",
-    "typescript": "^4.7.4",
-    "webpack-stream": "^7.0.0"
-  },
-  "dependencies": {
-    "geodesy": "^2.4.0"
-  }
+	"name": "timestamp2iso",
+	"version": "1.0.0",
+	"description": "",
+	"main": "main.js",
+	"scripts": {
+		"utils": "concurrently \"gulp utils\" \"nodemon scripts/csv2svg.js -w scripts/csv2svg.js\""
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/tougaj/timestamp2ISO.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/tougaj/timestamp2ISO/issues"
+	},
+	"homepage": "https://github.com/tougaj/timestamp2ISO#readme",
+	"devDependencies": {
+		"@types/bootstrap": "^5.2.1",
+		"@types/geodesy": "^2.2.3",
+		"@types/jquery": "^3.5.14",
+		"bootstrap": "^5.2.0",
+		"browser-sync": "^2.27.10",
+		"del": "^6.1.1",
+		"gulp": "^4.0.2",
+		"gulp-autoprefixer": "^8.0.0",
+		"gulp-changed": "^4.0.3",
+		"gulp-clean-css": "^4.3.0",
+		"gulp-plumber": "^1.2.1",
+		"gulp-replace": "^1.1.3",
+		"gulp-sass": "^5.1.0",
+		"gulp-typescript": "^6.0.0-alpha.1",
+		"jquery": "^3.6.0",
+		"moment": "^2.29.4",
+		"moment-locales-webpack-plugin": "^1.2.0",
+		"sass": "^1.54.0",
+		"typescript": "^4.7.4",
+		"webpack-stream": "^7.0.0"
+	},
+	"dependencies": {
+		"geodesy": "^2.4.0"
+	}
 }
