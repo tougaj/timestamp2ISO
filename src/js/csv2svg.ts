@@ -85,24 +85,26 @@ const saveSvg = (svg: string) => {
 };
 
 const inputControlChange = async () => {
-	if (!inputControl) return;
-	const input = inputControl[0] as HTMLInputElement;
-	if (!input.files || input.files.length === 0) return;
-	const [file] = input.files;
-	const polygons = await getCsv(file);
-	input.value = '';
+	try {
+		if (!inputControl) return;
+		const input = inputControl[0] as HTMLInputElement;
+		if (!input.files || input.files.length === 0) return;
+		const [file] = input.files;
+		if (!file.name.endsWith('.csv')) throw new Error('Оберіть, будь-ласка, csv-файл');
+		const polygons = await getCsv(file);
+		input.value = '';
 
-	const polygonCoords = polygons.map(getPolygonCoords);
-	// console.log(polygonCoords);
+		const polygonCoords = polygons.map(getPolygonCoords);
+		// console.log(polygonCoords);
 
-	const normalizedPolygonCoords = normalizeCoords(polygonCoords);
-	// console.log(normalizedPolygonCoords);
+		const normalizedPolygonCoords = normalizeCoords(polygonCoords);
+		// console.log(normalizedPolygonCoords);
 
-	// const svgPath = polygonCoords.map(getSvgPath);
-	const svgPath = normalizedPolygonCoords.map(getSvgPath);
+		// const svgPath = polygonCoords.map(getSvgPath);
+		const svgPath = normalizedPolygonCoords.map(getSvgPath);
 
-	const paths = svgPath.join('\n');
-	const svg = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+		const paths = svgPath.join('\n');
+		const svg = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg>
   <g
      inkscape:label="Шар 1"
@@ -113,7 +115,10 @@ const inputControlChange = async () => {
 </svg>
 `;
 
-	saveSvg(svg);
+		saveSvg(svg);
+	} catch (error) {
+		alert((error as Error).message);
+	}
 };
 
 export const csv2svgInit = () => {

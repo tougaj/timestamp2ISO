@@ -83,19 +83,22 @@ const saveSvg = (svg) => {
     }, 5000);
 };
 const inputControlChange = () => __awaiter(void 0, void 0, void 0, function* () {
-    if (!inputControl)
-        return;
-    const input = inputControl[0];
-    if (!input.files || input.files.length === 0)
-        return;
-    const [file] = input.files;
-    const polygons = yield getCsv(file);
-    input.value = '';
-    const polygonCoords = polygons.map(getPolygonCoords);
-    const normalizedPolygonCoords = normalizeCoords(polygonCoords);
-    const svgPath = normalizedPolygonCoords.map(getSvgPath);
-    const paths = svgPath.join('\n');
-    const svg = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    try {
+        if (!inputControl)
+            return;
+        const input = inputControl[0];
+        if (!input.files || input.files.length === 0)
+            return;
+        const [file] = input.files;
+        if (!file.name.endsWith('.csv'))
+            throw new Error('Оберіть, будь-ласка, csv-файл');
+        const polygons = yield getCsv(file);
+        input.value = '';
+        const polygonCoords = polygons.map(getPolygonCoords);
+        const normalizedPolygonCoords = normalizeCoords(polygonCoords);
+        const svgPath = normalizedPolygonCoords.map(getSvgPath);
+        const paths = svgPath.join('\n');
+        const svg = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg>
   <g
      inkscape:label="Шар 1"
@@ -105,7 +108,11 @@ const inputControlChange = () => __awaiter(void 0, void 0, void 0, function* () 
   </g>
 </svg>
 `;
-    saveSvg(svg);
+        saveSvg(svg);
+    }
+    catch (error) {
+        alert(error.message);
+    }
 });
 const csv2svgInit = () => {
     inputControl = $(`<input

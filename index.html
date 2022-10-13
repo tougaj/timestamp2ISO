@@ -78,7 +78,7 @@
 					</form>
 				</div>
 			</section>
-			<section class="row mt-3">
+			<section class="row mt-4">
 				<div class="col-12">
 					<h2><i class="bi bi-globe"></i> Конвертація градусних координат</h2>
 				</div>
@@ -176,7 +176,7 @@
 					><span id="placeByPoint" class=""></span>
 				</div>
 			</section>
-			<section class="row mt-3">
+			<section class="row mt-0">
 				<div class="col-12">
 					<h2 class="d-flex justify-content-between">
 						<div class="">
@@ -186,21 +186,39 @@
 								><i class="bi bi-box-arrow-up-right"></i
 							></a>
 						</div>
-						<button class="btn btn-outline-secondary disabled" id="btnAlertAlarmEnable">
-							<i class="bi bi-bell-fill"></i> Сповіщати про тривоги
-						</button>
 					</h2>
 				</div>
 				<div class="col-12 alarm__container gap-2"></div>
 			</section>
-			<section class="row mt-3">
+			<section class="row mt-4">
 				<div class="col-12">
 					<h2><i class="bi bi-boxes"></i> Різне</h2>
 				</div>
-				<div class="col-12">
-					<button class="btn btn-outline-secondary" id="btnCsv2Svg">
-						<i class="bi bi-bounding-box-circles me-1"></i>Перетворити область з csv в svg
+				<div class="col-3">
+					<button class="btn btn-secondary w-100" id="btnCsv2Svg">
+						<i class="bi bi-bounding-box me-1"></i>Перетворити область з csv в svg
 					</button>
+				</div>
+				<div class="col-9">
+					Як це працює:
+					<ol>
+						<li>В google-картах експортуйте шар як csv.</li>
+						<li>
+							Натисніть на кнопку ліворуч і в діалоговому вікні, що з'явиться, оберіть експортований тільки-но файл csv.
+						</li>
+						<li>Буде виконано автоматичне конвертування обраного csv-файлу в svg-файл.</li>
+						<li>Завантажте та збережіть створений щойно файл (зазвичай цей процес має бути автоматичним).</li>
+						<li>Додайте отриманий svg-файл у свій документ (скоріше за все це карта).</li>
+					</ol>
+				</div>
+				<div class="col-3">
+					<button class="btn btn-secondary disabled w-100" id="btnAlertAlarmEnable">
+						<i class="bi bi-bell-fill"></i> Сповіщати про тривоги
+					</button>
+				</div>
+				<div class="col-9">
+					При активації даного режиму Ви будете отримувати інформацію про оголошені та скасовані повітряні тривоги на
+					своєму робочому столі.
 				</div>
 			</section>
 		</div>
