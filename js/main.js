@@ -37,20 +37,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mgrs_1 = __importStar(require("geodesy/mgrs"));
 const moment_1 = __importDefault(require("moment"));
-const API_KEY = 'AIzaSyDBQj8I0ElYPaXxgInMT3Ped3BS9blqy8Q';
-const ALERT_X_API_KEY = '86a7a81dad35ff830cb6e8d4d346434c48c0c514';
-const ALERT_UPDATE_INTERVAL = 20 * 1000;
-const TOAST_TIMEOUT = 1000;
-const state = {
-    alerts: new Set(),
-};
+const common_1 = require("./common");
+const csv2svg_1 = require("./csv2svg");
+const raidAlert_1 = require("./raidAlert");
 try {
     moment_1.default.locale(navigator.language);
 }
 catch (error) {
     moment_1.default.locale('uk-UA');
 }
-const promiseTimeout = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 $(function () {
     $('#editDate').on('change', printUTCDate);
     $('#editTime').on('change', printUTCDate);
@@ -60,13 +55,14 @@ $(function () {
     $('.btn-copy-to-clipboard').on('click', copyInputToClipboard);
     $('#editDegreeNumeric').on('change', onEditDegreeNumericChange);
     $('#editMgrs').on('change', onEditMgrsChange);
-    $('#btnAlertAlarmEnable').on('click', btnAlertAlarmEnableClick);
-    updateAlertAlarmEnableButton();
+    $('#btnAlertAlarmEnable').on('click', raidAlert_1.btnAlertAlarmEnableClick);
+    (0, csv2svg_1.csv2svgInit)();
+    (0, raidAlert_1.updateAlertAlarmEnableButton)();
     resetToCurrentDateTime();
     onDegreeChange();
     updateWarDuration();
-    updateRaidAlert();
-    setInterval(updateRaidAlert, ALERT_UPDATE_INTERVAL);
+    (0, raidAlert_1.updateRaidAlert)();
+    setInterval(raidAlert_1.updateRaidAlert, common_1.ALERT_UPDATE_INTERVAL);
 });
 const printUTCDate = () => {
     const date = $('#editDate').val();
@@ -111,11 +107,11 @@ const showToast = (text, className = 'bg-success text-white') => __awaiter(void 
     const toast = $('<div id="liveToast" class="toast fade show showing" role="alert" aria-live="assertive" aria-atomic="true"></div>')
         .append(`<div class="toast-body p-3 ${className}">${text}</div>`)
         .appendTo(toastsContainer);
-    yield promiseTimeout(0);
+    yield (0, common_1.promiseTimeout)(0);
     toast.removeClass('showing');
-    yield promiseTimeout(TOAST_TIMEOUT);
+    yield (0, common_1.promiseTimeout)(common_1.TOAST_TIMEOUT);
     toast.addClass('showing');
-    yield promiseTimeout(500);
+    yield (0, common_1.promiseTimeout)(500);
     toast.remove();
 });
 function copyInputToClipboard() {
@@ -124,7 +120,7 @@ function copyInputToClipboard() {
     const input = button.siblings('input')[0];
     navigator.clipboard.writeText(input.value);
     button.toggleClass(classForToggle);
-    setTimeout(() => button.toggleClass(classForToggle), TOAST_TIMEOUT);
+    setTimeout(() => button.toggleClass(classForToggle), common_1.TOAST_TIMEOUT);
     showToast('Скопійовано до буферу обміну');
 }
 function onEditDegreeNumericChange() {
@@ -177,7 +173,7 @@ const updateDegreesFromCoordinates = (coordinates) => {
         .toString();
     const params = {
         q: encodeURIComponent(coordinates),
-        key: API_KEY,
+        key: common_1.API_KEY,
         zoom: 14,
         region: 'UA',
     };
@@ -209,121 +205,8 @@ const mWarStart = (0, moment_1.default)('2022-02-24T03:00:00.000Z');
 const updateWarDuration = () => {
     const mCurrent = (0, moment_1.default)();
     const warDuration = moment_1.default.duration(mCurrent.diff(mWarStart));
-    const sDuration = getHumanizeDuration(warDuration);
+    const sDuration = (0, common_1.getHumanizeDuration)(warDuration);
     document.querySelector('.war-duration__duration').innerText = sDuration;
     document.querySelector('.war-duration__days').innerText = `${Math.ceil(warDuration.asDays())} добу`;
     setTimeout(updateWarDuration, 60000 - (mCurrent.get('seconds') * 1000 + mCurrent.get('milliseconds')) + 1);
-};
-const updateRaidAlert = () => {
-    fetch('https://alerts.com.ua/api/states', {
-        headers: {
-            'X-API-Key': ALERT_X_API_KEY,
-        },
-    })
-        .then((response) => response.json())
-        .then((data) => {
-        const regionsWithAlerts = data.states.filter((state) => state.alert);
-        regionsWithAlerts.sort((a, b) => -a.changed.localeCompare(b.changed));
-        const now = (0, moment_1.default)();
-        const container = $('.alarm__container').empty();
-        $('.alarm__date').text(`(станом на ${(0, moment_1.default)(data.last_update).format('L LT')})`);
-        regionsWithAlerts.forEach(({ name, id, changed }) => {
-            const m = (0, moment_1.default)(changed);
-            const duration = moment_1.default.duration(now.diff(m));
-            const durationInMinutes = duration.asMinutes();
-            const containerColorClass = durationInMinutes < 120
-                ? durationInMinutes < 10
-                    ? 'alarm__region-container--warning'
-                    : durationInMinutes < 60
-                        ? 'alarm__region-container--danger alarm__light_text'
-                        : 'alarm__region-container--info'
-                : '';
-            const sStarted = m.format('LT L');
-            $(`<div class="alarm__region-container rounded px-2 py-1 ${containerColorClass}" id="alarmRegion${id}"></div>`)
-                .append(`<div class="alarm__region-title fs-5">${name}</div>`)
-                .append($('<div class="d-flex justify-content-between align-items-end"></div>')
-                .append(`<div class="alarm__duration text-nowrap"><i class="bi bi-clock"></i> Триває ${getHumanizeDuration(duration)}</div>
-					`)
-                .append(`<div class="alarm__started text-truncate ms-1 text-small" title="Оголошено в ${sStarted}"><i class="bi bi-megaphone"></i> ${sStarted}</div>`))
-                .appendTo(container);
-        });
-        if (Notify.allow())
-            notifyAlerts(regionsWithAlerts.map((state) => state.name));
-    });
-};
-const notifyAlerts = (newAlerts) => {
-    function difference(setA, setB) {
-        var _difference = new Set(setA);
-        for (var elem of setB) {
-            _difference.delete(elem);
-        }
-        return _difference;
-    }
-    const oldAlertSet = state.alerts;
-    const newAlertSet = new Set(newAlerts);
-    const addedALerts = difference(newAlertSet, oldAlertSet);
-    const removedAlerts = difference(oldAlertSet, newAlertSet);
-    state.alerts = newAlertSet;
-    if (addedALerts.size === 0 && removedAlerts.size === 0)
-        return;
-    const title = [
-        addedALerts.size === 0 ? undefined : `оголошені 🔴 ${addedALerts.size}`,
-        removedAlerts.size === 0 ? undefined : `скасовані 🟢 ${removedAlerts.size}`,
-    ]
-        .filter(Boolean)
-        .join(', ');
-    Notify.show({
-        title: `Повітряні тривоги: ${title}`,
-        body: [...addedALerts]
-            .map((s) => `🔴 ${s}`)
-            .concat([...removedAlerts].map((s) => `🟢 ${s}`))
-            .join('\n'),
-    });
-};
-const getHumanizeDuration = (duration, withSeconds = false) => {
-    let result = '';
-    if (duration.months() !== 0)
-        result += `${duration.months()} міс. `;
-    if (duration.days() !== 0)
-        result += `${duration.days()} д. `;
-    if (duration.hours() !== 0)
-        result += `${duration.hours()} год. `;
-    if (duration.minutes() !== 0)
-        result += `${duration.minutes()} хв. `;
-    if (withSeconds && duration.seconds() !== 0) {
-        result += `${duration.seconds()} с. `;
-    }
-    return result || 'декілька секунд';
-};
-const btnAlertAlarmEnableClick = () => {
-    Notify.requestPermission();
-};
-const updateAlertAlarmEnableButton = () => {
-    if (Notification.permission === 'default')
-        $('#btnAlertAlarmEnable').removeClass('disabled');
-    else
-        $('#btnAlertAlarmEnable').addClass('disabled');
-};
-1;
-const Notify = {
-    defaultIcon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/313/megaphone_1f4e3.png',
-    defaultTimeout: 10000,
-    requestPermission: function () {
-        if (!('Notification' in window)) {
-            return;
-        }
-        Notification.requestPermission().then((permission) => {
-            updateAlertAlarmEnableButton();
-        });
-    },
-    allow: function () {
-        return Notification.permission === 'granted';
-    },
-    show: function ({ title = 'Оповіщення', body = '', icon = Notify.defaultIcon, timeout = Notify.defaultTimeout }) {
-        const notification = new Notification(title, {
-            body,
-            icon,
-        });
-        setTimeout(() => notification.close(), timeout);
-    },
 };

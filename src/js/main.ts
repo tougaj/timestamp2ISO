@@ -1,23 +1,22 @@
 // import Toast from 'bootstrap/js/dist/toast';
 import Mgrs, { LatLon } from 'geodesy/mgrs';
 import moment from 'moment';
-
-const API_KEY = 'AIzaSyDBQj8I0ElYPaXxgInMT3Ped3BS9blqy8Q';
-const ALERT_X_API_KEY = '86a7a81dad35ff830cb6e8d4d346434c48c0c514';
-const ALERT_UPDATE_INTERVAL = 20 * 1000;
-const TOAST_TIMEOUT = 1000;
-
-const state: IGlobalState = {
-	alerts: new Set(),
-};
+import {
+	ALERT_UPDATE_INTERVAL,
+	API_KEY,
+	getHumanizeDuration,
+	promiseTimeout,
+	TOAST_TIMEOUT,
+	TWorldDirection,
+} from './common';
+import { csv2svgInit } from './csv2svg';
+import { btnAlertAlarmEnableClick, updateAlertAlarmEnableButton, updateRaidAlert } from './raidAlert';
 
 try {
 	moment.locale(navigator.language);
 } catch (error) {
 	moment.locale('uk-UA');
 }
-
-const promiseTimeout = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 $(function () {
 	$('#editDate').on('change', printUTCDate);
@@ -29,6 +28,7 @@ $(function () {
 	$('#editDegreeNumeric').on('change', onEditDegreeNumericChange);
 	$('#editMgrs').on('change', onEditMgrsChange);
 	$('#btnAlertAlarmEnable').on('click', btnAlertAlarmEnableClick);
+	csv2svgInit();
 	updateAlertAlarmEnableButton();
 	resetToCurrentDateTime();
 	onDegreeChange();
@@ -278,151 +278,3 @@ const updateWarDuration = () => {
 	)} добу`;
 	setTimeout(updateWarDuration, 60000 - (mCurrent.get('seconds') * 1000 + mCurrent.get('milliseconds')) + 1);
 };
-
-const updateRaidAlert = () => {
-	fetch('https://alerts.com.ua/api/states', {
-		headers: {
-			'X-API-Key': ALERT_X_API_KEY,
-		},
-	})
-		.then((response) => response.json())
-		.then((data: IRedAlert) => {
-			const regionsWithAlerts = data.states.filter((state) => state.alert);
-			regionsWithAlerts.sort((a, b) => -a.changed.localeCompare(b.changed));
-			const now = moment();
-			const container = $('.alarm__container').empty();
-			$('.alarm__date').text(`(станом на ${moment(data.last_update).format('L LT')})`);
-			regionsWithAlerts.forEach(({ name, id, changed }) => {
-				const m = moment(changed);
-				const duration = moment.duration(now.diff(m));
-				const durationInMinutes = duration.asMinutes();
-				const containerColorClass =
-					durationInMinutes < 120
-						? durationInMinutes < 10
-							? 'alarm__region-container--warning'
-							: durationInMinutes < 60
-							? 'alarm__region-container--danger alarm__light_text'
-							: 'alarm__region-container--info'
-						: '';
-				const sStarted = m.format('LT L');
-				$(
-					`<div class="alarm__region-container rounded px-2 py-1 ${containerColorClass}" id="alarmRegion${id}"></div>`
-				)
-					.append(`<div class="alarm__region-title fs-5">${name}</div>`)
-					.append(
-						$('<div class="d-flex justify-content-between align-items-end"></div>')
-							.append(
-								`<div class="alarm__duration text-nowrap"><i class="bi bi-clock"></i> Триває ${getHumanizeDuration(
-									duration
-								)}</div>
-					`
-							)
-							.append(
-								`<div class="alarm__started text-truncate ms-1 text-small" title="Оголошено в ${sStarted}"><i class="bi bi-megaphone"></i> ${sStarted}</div>`
-							)
-					)
-					.appendTo(container);
-			});
-			if (Notify.allow()) notifyAlerts(regionsWithAlerts.map((state) => state.name));
-		});
-};
-
-const notifyAlerts = (newAlerts: string[]) => {
-	function difference(setA: Set<string>, setB: Set<string>) {
-		var _difference = new Set(setA);
-		for (var elem of setB) {
-			_difference.delete(elem);
-		}
-		return _difference;
-	}
-
-	const oldAlertSet = state.alerts;
-	const newAlertSet = new Set(newAlerts);
-	const addedALerts = difference(newAlertSet, oldAlertSet);
-	const removedAlerts = difference(oldAlertSet, newAlertSet);
-
-	state.alerts = newAlertSet;
-	if (addedALerts.size === 0 && removedAlerts.size === 0) return;
-
-	const title = [
-		addedALerts.size === 0 ? undefined : `оголошені 🔴 ${addedALerts.size}`,
-		removedAlerts.size === 0 ? undefined : `скасовані 🟢 ${removedAlerts.size}`,
-	]
-		.filter(Boolean)
-		.join(', ');
-	Notify.show({
-		title: `Повітряні тривоги: ${title}`,
-		body: [...addedALerts]
-			.map((s) => `🔴 ${s}`)
-			.concat([...removedAlerts].map((s) => `🟢 ${s}`))
-			.join('\n'),
-	});
-};
-
-const getHumanizeDuration = (duration: moment.Duration, withSeconds = false) => {
-	let result = '';
-	if (duration.months() !== 0) result += `${duration.months()} міс. `;
-	if (duration.days() !== 0) result += `${duration.days()} д. `;
-	if (duration.hours() !== 0) result += `${duration.hours()} год. `;
-	if (duration.minutes() !== 0) result += `${duration.minutes()} хв. `;
-	if (withSeconds && duration.seconds() !== 0) {
-		result += `${duration.seconds()} с. `;
-	}
-	return result || 'декілька секунд';
-};
-
-const btnAlertAlarmEnableClick = () => {
-	Notify.requestPermission();
-};
-
-const updateAlertAlarmEnableButton = () => {
-	if (Notification.permission === 'default') $('#btnAlertAlarmEnable').removeClass('disabled');
-	else $('#btnAlertAlarmEnable').addClass('disabled');
-};
-1;
-const Notify = {
-	// icon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/325/warning_26a0-fe0f.png',
-	// icon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/313/bomb_1f4a3.png',
-	defaultIcon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/313/megaphone_1f4e3.png',
-	// icon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/325/skull-and-crossbones_2620-fe0f.png',
-	// icon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/313/collision_1f4a5.png',
-	defaultTimeout: 10000,
-
-	requestPermission: function () {
-		if (!('Notification' in window)) {
-			return;
-		}
-		Notification.requestPermission().then((permission) => {
-			updateAlertAlarmEnableButton();
-		});
-	},
-
-	allow: function () {
-		return Notification.permission === 'granted';
-	},
-
-	show: function ({ title = 'Оповіщення', body = '', icon = Notify.defaultIcon, timeout = Notify.defaultTimeout }) {
-		const notification = new Notification(title, {
-			body,
-			icon,
-		});
-		setTimeout(() => notification.close(), timeout);
-	},
-} as any;
-
-interface IGlobalState {
-	alerts: Set<string>;
-}
-
-interface IRedAlertElement {
-	id: number;
-	name: string;
-	alert: boolean;
-	changed: string;
-}
-interface IRedAlert {
-	last_update: string;
-	states: IRedAlertElement[];
-}
-
-type TWorldDirection = 'N' | 'E' | 'S' | 'W';
