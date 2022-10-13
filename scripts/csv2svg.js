@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const csv_reader_1 = __importDefault(require("csv-reader"));
 const node_fs_1 = require("node:fs");
+const SCALE_COEFFICIENT = 50;
 const getPolygons = (fileName) => new Promise((resolve) => {
     const csv = [];
     let inputStream = (0, node_fs_1.createReadStream)(fileName, 'utf8');
@@ -40,14 +41,27 @@ const getPolygonCoords = (polygon) => {
 const getSvgPath = (coords, index) => {
     const sPath = coords.map(([lat, lon]) => `${lat},${lon}`).join(' ');
     return `<path
-    style="fill:#1c1c1c;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:0.5;stroke-dasharray:none"
+    style="fill:#6a6a6a;stroke:#000000;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:0.5;stroke-dasharray:none"
     d="M ${sPath} Z"
     id="path_${index}" />`;
+};
+const getMinMax = (coord) => {
+    const min = Math.min(...coord);
+    const max = Math.max(...coord);
+    return { min, max, avg: (min + max) / 2 };
+};
+const normalizeCoordItem = (coord, minLat, minLon) => coord.map(([lat, lon]) => [(lat - minLat) * SCALE_COEFFICIENT, (lon - minLon) * SCALE_COEFFICIENT]);
+const normalizeCoords = (coords) => {
+    const flat = coords.flat();
+    const latBounds = getMinMax(flat.map(([lat]) => lat));
+    const lonBounds = getMinMax(flat.map(([, lon]) => lon));
+    return coords.map((coordItem) => normalizeCoordItem(coordItem, latBounds.min, lonBounds.min));
 };
 const convert = (fileName) => __awaiter(void 0, void 0, void 0, function* () {
     const polygons = yield getPolygons(fileName);
     const polygonCoords = polygons.map(getPolygonCoords);
-    const svgPath = polygonCoords.map(getSvgPath);
+    const normalizedPolygonCoords = normalizeCoords(polygonCoords);
+    const svgPath = normalizedPolygonCoords.map(getSvgPath);
     return svgPath.join('\n');
 });
 (function main() {
