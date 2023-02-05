@@ -6,7 +6,7 @@ export interface IRedAlertElement {
 	id: number;
 	name: string;
 	alert: boolean;
-	changed: string;
+	changed: string | null;
 }
 export interface IRedAlert {
 	last_update: string;
@@ -25,6 +25,7 @@ export const state: IGlobalState = {
 };
 
 export const getHumanizeDuration = (duration: moment.Duration, withSeconds = false) => {
+	if (!duration.isValid()) return '';
 	let result = '';
 	if (duration.months() !== 0) result += `${duration.months()} міс. `;
 	if (duration.days() !== 0) result += `${duration.days()} д. `;
