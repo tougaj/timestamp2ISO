@@ -10,7 +10,9 @@ export const updateRaidAlert = () => {
 		.then((response) => response.json())
 		.then((data: IRedAlert) => {
 			const regionsWithAlerts = data.states.filter((state) => state.alert);
-			regionsWithAlerts.sort((a, b) => -(a.changed || '2022-02-24T05:00:00+02:00').localeCompare(b.changed || '2022-02-24T05:00:00+02:00'));
+			regionsWithAlerts.sort(
+				(a, b) => -(a.changed || '2022-02-24T05:00:00+02:00').localeCompare(b.changed || '2022-02-24T05:00:00+02:00')
+			);
 			const now = moment();
 			const container = $('.alarm__container').empty();
 			$('.alarm__date').text(`(станом на ${moment(data.last_update).format('L LT')})`);

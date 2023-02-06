@@ -9,6 +9,8 @@ exports.state = {
     alerts: new Set(),
 };
 const getHumanizeDuration = (duration, withSeconds = false) => {
+    if (!duration.isValid())
+        return '';
     let result = '';
     if (duration.months() !== 0)
         result += `${duration.months()} міс. `;

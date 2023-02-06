@@ -15,7 +15,7 @@ const updateRaidAlert = () => {
         .then((response) => response.json())
         .then((data) => {
         const regionsWithAlerts = data.states.filter((state) => state.alert);
-        regionsWithAlerts.sort((a, b) => -a.changed.localeCompare(b.changed));
+        regionsWithAlerts.sort((a, b) => -(a.changed || '2022-02-24T05:00:00+02:00').localeCompare(b.changed || '2022-02-24T05:00:00+02:00'));
         const now = (0, moment_1.default)();
         const container = $('.alarm__container').empty();
         $('.alarm__date').text(`(станом на ${(0, moment_1.default)(data.last_update).format('L LT')})`);
@@ -30,7 +30,7 @@ const updateRaidAlert = () => {
                         ? 'alarm__region-container--danger alarm__light_text'
                         : 'alarm__region-container--info'
                 : '';
-            const sStarted = m.format('LT L');
+            const sStarted = duration.isValid() ? m.format('LT L') : '';
             $(`<div class="alarm__region-container rounded px-2 py-1 ${containerColorClass}" id="alarmRegion${id}"></div>`)
                 .append(`<div class="alarm__region-title fs-5">${name}</div>`)
                 .append($('<div class="d-flex justify-content-between align-items-end"></div>')
