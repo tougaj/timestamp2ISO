@@ -91,11 +91,7 @@ const notifyAlerts = (newAlerts: string[]) => {
 };
 
 const Notify = {
-	// icon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/325/warning_26a0-fe0f.png',
-	// icon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/313/bomb_1f4a3.png',
-	defaultIcon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/313/megaphone_1f4e3.png',
-	// icon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/325/skull-and-crossbones_2620-fe0f.png',
-	// icon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/313/collision_1f4a5.png',
+	defaultIcon: 'https://em-content.zobj.net/thumbs/160/google/350/megaphone_1f4e3.png',
 	defaultTimeout: 10000,
 
 	requestPermission: function () {

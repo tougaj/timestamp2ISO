@@ -22,6 +22,8 @@ const getHumanizeDuration = (duration, withSeconds = false) => {
     if (!duration.isValid())
         return '';
     let result = '';
+    if (duration.years() !== 0)
+        result += `${duration.years()} р. `;
     if (duration.months() !== 0)
         result += `${duration.months()} міс. `;
     if (duration.days() !== 0)
@@ -500,7 +502,7 @@ const notifyAlerts = (newAlerts) => {
     });
 };
 const Notify = {
-    defaultIcon: 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/google/313/megaphone_1f4e3.png',
+    defaultIcon: 'https://em-content.zobj.net/thumbs/160/google/350/megaphone_1f4e3.png',
     defaultTimeout: 10000,
     requestPermission: function () {
         if (!('Notification' in window)) {

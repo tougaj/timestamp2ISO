@@ -29,6 +29,7 @@ export const state: IGlobalState = {
 export const getHumanizeDuration = (duration: moment.Duration, withSeconds = false) => {
 	if (!duration.isValid()) return '';
 	let result = '';
+	if (duration.years() !== 0) result += `${duration.years()} р. `;
 	if (duration.months() !== 0) result += `${duration.months()} міс. `;
 	if (duration.days() !== 0) result += `${duration.days()} д. `;
 	if (duration.hours() !== 0) result += `${duration.hours()} год. `;
