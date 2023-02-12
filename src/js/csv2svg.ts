@@ -1,4 +1,5 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
+import $ from 'jquery';
 import { parse } from 'papaparse';
 
 type TLatLon = [number, number];
@@ -71,7 +72,7 @@ const saveSvg = (svg: string) => {
 	const objectUrl = URL.createObjectURL(blob);
 	const link = document.createElement('a');
 	link.setAttribute('href', objectUrl);
-	link.setAttribute('download', `fromCSV_${moment().format('YYYYMMDD_HHmmss')}.svg`);
+	link.setAttribute('download', `fromCSV_${dayjs().format('YYYYMMDD_HHmmss')}.svg`);
 	link.textContent = 'download';
 	link.className = 'd-none';
 	const body = document.querySelector('body');

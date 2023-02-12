@@ -1,4 +1,5 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
+import $ from 'jquery';
 import { ALERT_X_API_KEY, getHumanizeDuration, IRedAlert, state } from './common';
 
 export const updateRaidAlert = () => {
@@ -13,12 +14,13 @@ export const updateRaidAlert = () => {
 			regionsWithAlerts.sort(
 				(a, b) => -(a.changed || '2022-02-24T05:00:00+02:00').localeCompare(b.changed || '2022-02-24T05:00:00+02:00')
 			);
-			const now = moment();
+			const now = dayjs();
 			const container = $('.alarm__container').empty();
-			$('.alarm__date').text(`(станом на ${moment(data.last_update).format('L LT')})`);
+			$('.alarm__date').text(`(станом на ${dayjs(data.last_update).format('DD.MM.YYYY HH:mm')})`);
 			regionsWithAlerts.forEach(({ name, id, changed }) => {
-				const m = moment(changed);
-				const duration = moment.duration(now.diff(m));
+				const m = dayjs(changed);
+				const duration = dayjs.duration(now.diff(m));
+
 				const durationInMinutes = duration.asMinutes();
 				const containerColorClass =
 					durationInMinutes < 120
@@ -28,7 +30,7 @@ export const updateRaidAlert = () => {
 							? 'alarm__region-container--danger alarm__light_text'
 							: 'alarm__region-container--info'
 						: '';
-				const sStarted = duration.isValid() ? m.format('LT L') : '';
+				const sStarted = !isNaN(duration.asMilliseconds()) ? ` в ${m.format('DD.MM.YYYY HH:mm')}` : '';
 				$(`<div class="alarm__region-container rounded px-2 py-1 ${containerColorClass}" id="alarmRegion${id}"></div>`)
 					.append(`<div class="alarm__region-title fs-5">${name}</div>`)
 					.append(
@@ -40,7 +42,7 @@ export const updateRaidAlert = () => {
 					`
 							)
 							.append(
-								`<div class="alarm__started text-truncate ms-1 text-small" title="Оголошено в ${sStarted}"><i class="bi bi-megaphone"></i> ${sStarted}</div>`
+								`<div class="alarm__started text-truncate ms-1 text-small" title="Оголошено${sStarted}"><i class="bi bi-megaphone"></i> ${sStarted}</div>`
 							)
 					)
 					.appendTo(container);

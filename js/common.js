@@ -9,20 +9,20 @@ exports.state = {
     alerts: new Set(),
 };
 const getHumanizeDuration = (duration, withSeconds = false) => {
-    if (!duration.isValid())
+    if (isNaN(duration.asMilliseconds()))
         return '';
     let result = '';
-    if (duration.years() !== 0)
+    if (!!duration.years())
         result += `${duration.years()} р. `;
-    if (duration.months() !== 0)
+    if (!!duration.months())
         result += `${duration.months()} міс. `;
-    if (duration.days() !== 0)
+    if (!!duration.days())
         result += `${duration.days()} д. `;
-    if (duration.hours() !== 0)
+    if (!!duration.hours())
         result += `${duration.hours()} год. `;
-    if (duration.minutes() !== 0)
+    if (!!duration.minutes())
         result += `${duration.minutes()} хв. `;
-    if (withSeconds && duration.seconds() !== 0) {
+    if (withSeconds && !!duration.seconds()) {
         result += `${duration.seconds()} с. `;
     }
     return result || 'декілька секунд';

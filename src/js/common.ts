@@ -1,4 +1,4 @@
-import moment from 'moment';
+import duration from 'dayjs/plugin/duration';
 
 export interface IGlobalState {
 	alerts: Set<string>;
@@ -26,15 +26,15 @@ export const state: IGlobalState = {
 	alerts: new Set(),
 };
 
-export const getHumanizeDuration = (duration: moment.Duration, withSeconds = false) => {
-	if (!duration.isValid()) return '';
+export const getHumanizeDuration = (duration: duration.Duration, withSeconds = false) => {
+	if (isNaN(duration.asMilliseconds())) return '';
 	let result = '';
-	if (duration.years() !== 0) result += `${duration.years()} р. `;
-	if (duration.months() !== 0) result += `${duration.months()} міс. `;
-	if (duration.days() !== 0) result += `${duration.days()} д. `;
-	if (duration.hours() !== 0) result += `${duration.hours()} год. `;
-	if (duration.minutes() !== 0) result += `${duration.minutes()} хв. `;
-	if (withSeconds && duration.seconds() !== 0) {
+	if (!!duration.years()) result += `${duration.years()} р. `;
+	if (!!duration.months()) result += `${duration.months()} міс. `;
+	if (!!duration.days()) result += `${duration.days()} д. `;
+	if (!!duration.hours()) result += `${duration.hours()} год. `;
+	if (!!duration.minutes()) result += `${duration.minutes()} хв. `;
+	if (withSeconds && !!duration.seconds()) {
 		result += `${duration.seconds()} с. `;
 	}
 	return result || 'декілька секунд';

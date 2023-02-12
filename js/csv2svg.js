@@ -13,7 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.csv2svgInit = void 0;
-const moment_1 = __importDefault(require("moment"));
+const dayjs_1 = __importDefault(require("dayjs"));
+const jquery_1 = __importDefault(require("jquery"));
 const papaparse_1 = require("papaparse");
 const SCALE_COEFFICIENT = 50;
 let inputControl = undefined;
@@ -69,7 +70,7 @@ const saveSvg = (svg) => {
     const objectUrl = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', objectUrl);
-    link.setAttribute('download', `fromCSV_${(0, moment_1.default)().format('YYYYMMDD_HHmmss')}.svg`);
+    link.setAttribute('download', `fromCSV_${(0, dayjs_1.default)().format('YYYYMMDD_HHmmss')}.svg`);
     link.textContent = 'download';
     link.className = 'd-none';
     const body = document.querySelector('body');
@@ -115,7 +116,7 @@ const inputControlChange = () => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 const csv2svgInit = () => {
-    inputControl = $(`<input
+    inputControl = (0, jquery_1.default)(`<input
 	type="file"
 	id="csv2svgInput"
 	name="csv2svg"
@@ -125,6 +126,6 @@ const csv2svgInit = () => {
 />`)
         .on('change', inputControlChange)
         .appendTo('body');
-    $('#btnCsv2Svg').on('click', btnCsv2SvgClick);
+    (0, jquery_1.default)('#btnCsv2Svg').on('click', btnCsv2SvgClick);
 };
 exports.csv2svgInit = csv2svgInit;

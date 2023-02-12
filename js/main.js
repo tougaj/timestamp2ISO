@@ -35,27 +35,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("dayjs/locale/uk");
+const jquery_1 = __importDefault(require("jquery"));
+const dayjs_1 = __importDefault(require("dayjs"));
+const duration_1 = __importDefault(require("dayjs/plugin/duration"));
+const relativeTime_1 = __importDefault(require("dayjs/plugin/relativeTime"));
 const mgrs_1 = __importStar(require("geodesy/mgrs"));
-const moment_1 = __importDefault(require("moment"));
 const common_1 = require("./common");
 const csv2svg_1 = require("./csv2svg");
 const raidAlert_1 = require("./raidAlert");
-try {
-    moment_1.default.locale(navigator.language);
-}
-catch (error) {
-    moment_1.default.locale('uk-UA');
-}
-$(function () {
-    $('#editDate').on('change', printUTCDate);
-    $('#editTime').on('change', printUTCDate);
-    $('#formTimeStamp').on('submit', onTimeStampSubmit);
-    $('#btnReset').on('click', resetToCurrentDateTime);
-    $('#formLat input[name]').add('#formLon input[name]').on('change', onDegreeChange);
-    $('.btn-copy-to-clipboard').on('click', copyInputToClipboard);
-    $('#editDegreeNumeric').on('change', onEditDegreeNumericChange);
-    $('#editMgrs').on('change', onEditMgrsChange);
-    $('#btnAlertAlarmEnable').on('click', raidAlert_1.btnAlertAlarmEnableClick);
+dayjs_1.default.extend(duration_1.default);
+dayjs_1.default.extend(relativeTime_1.default);
+(0, jquery_1.default)(function () {
+    (0, jquery_1.default)('#editDate').on('change', printUTCDate);
+    (0, jquery_1.default)('#editTime').on('change', printUTCDate);
+    (0, jquery_1.default)('#formTimeStamp').on('submit', onTimeStampSubmit);
+    (0, jquery_1.default)('#btnReset').on('click', resetToCurrentDateTime);
+    (0, jquery_1.default)('#formLat input[name]').add('#formLon input[name]').on('change', onDegreeChange);
+    (0, jquery_1.default)('.btn-copy-to-clipboard').on('click', copyInputToClipboard);
+    (0, jquery_1.default)('#editDegreeNumeric').on('change', onEditDegreeNumericChange);
+    (0, jquery_1.default)('#editMgrs').on('change', onEditMgrsChange);
+    (0, jquery_1.default)('#btnAlertAlarmEnable').on('click', raidAlert_1.btnAlertAlarmEnableClick);
     (0, csv2svg_1.csv2svgInit)();
     (0, raidAlert_1.updateAlertAlarmEnableButton)();
     resetToCurrentDateTime();
@@ -65,21 +65,21 @@ $(function () {
     setInterval(raidAlert_1.updateRaidAlert, common_1.ALERT_UPDATE_INTERVAL);
 });
 const printUTCDate = () => {
-    const date = $('#editDate').val();
-    const time = $('#editTime').val();
-    const mm = (0, moment_1.default)(`${date} ${time}`);
-    $('#utcDate').val(mm.toISOString());
+    const date = (0, jquery_1.default)('#editDate').val();
+    const time = (0, jquery_1.default)('#editTime').val();
+    const mm = (0, dayjs_1.default)(`${date} ${time}`, 'YYYY-MM-DD HH:mm');
+    (0, jquery_1.default)('#utcDate').val(mm.toISOString());
 };
 const onTimeStampSubmit = (event) => {
     event.preventDefault();
     printUTCDate();
 };
 const resetToCurrentDateTime = () => {
-    const mmCurrent = (0, moment_1.default)();
-    $('#editDate').val(mmCurrent.format('YYYY-MM-DD'));
-    $('#editTime').val(mmCurrent.format('HH:mm'));
+    const mmCurrent = (0, dayjs_1.default)();
+    (0, jquery_1.default)('#editDate').val(mmCurrent.format('YYYY-MM-DD'));
+    (0, jquery_1.default)('#editTime').val(mmCurrent.format('HH:mm'));
     printUTCDate();
-    $('#utcDate').focus().select();
+    (0, jquery_1.default)('#utcDate').focus().select();
 };
 const getDecimalDegree = (form) => {
     if (!form)
@@ -101,10 +101,10 @@ const onDegreeChange = () => {
     updateDegreesFromCoordinates(coordinates);
 };
 const showToast = (text, className = 'bg-success text-white') => __awaiter(void 0, void 0, void 0, function* () {
-    const toastsContainer = $('.toasts__container');
+    const toastsContainer = (0, jquery_1.default)('.toasts__container');
     if (!toastsContainer)
         return;
-    const toast = $('<div id="liveToast" class="toast fade show showing" role="alert" aria-live="assertive" aria-atomic="true"></div>')
+    const toast = (0, jquery_1.default)('<div id="liveToast" class="toast fade show showing" role="alert" aria-live="assertive" aria-atomic="true"></div>')
         .append(`<div class="toast-body p-3 ${className}">${text}</div>`)
         .appendTo(toastsContainer);
     yield (0, common_1.promiseTimeout)(0);
@@ -116,7 +116,7 @@ const showToast = (text, className = 'bg-success text-white') => __awaiter(void 
 });
 function copyInputToClipboard() {
     const classForToggle = 'btn-outline-secondary btn-outline-success';
-    const button = $(this);
+    const button = (0, jquery_1.default)(this);
     const input = button.siblings('input')[0];
     navigator.clipboard.writeText(input.value);
     button.toggleClass(classForToggle);
@@ -124,10 +124,10 @@ function copyInputToClipboard() {
     showToast('Скопійовано до буферу обміну');
 }
 function onEditDegreeNumericChange() {
-    updateDegreesFromCoordinates($(this).val());
+    updateDegreesFromCoordinates((0, jquery_1.default)(this).val());
 }
 function onEditMgrsChange() {
-    const mgrs = mgrs_1.default.parse($(this).val().toUpperCase());
+    const mgrs = mgrs_1.default.parse((0, jquery_1.default)(this).val().toUpperCase());
     const latlon = mgrs.toUtm().toLatLon();
     updateDegreesFromCoordinates(`${latlon._lat}, ${latlon._lon}`);
 }
@@ -192,19 +192,19 @@ const updatePlaceFromCoordinates = (coordinates) => {
         .then((r) => {
         if (r.error)
             throw new Error(r.error);
-        $('#placeByPoint').text(r.display_name);
-        $('#placeByPointIcon').addClass('animation-bounce');
-        setTimeout(() => $('#placeByPointIcon').removeClass('animation-bounce'), 2000);
+        (0, jquery_1.default)('#placeByPoint').text(r.display_name);
+        (0, jquery_1.default)('#placeByPointIcon').addClass('animation-bounce');
+        setTimeout(() => (0, jquery_1.default)('#placeByPointIcon').removeClass('animation-bounce'), 2000);
     })
         .catch((error) => {
-        $('#placeByPoint').text('Місце не визначено');
+        (0, jquery_1.default)('#placeByPoint').text('Місце не визначено');
         console.error(error);
     });
 };
-const mWarStart = (0, moment_1.default)('2022-02-24T03:00:00.000Z');
+const mWarStart = (0, dayjs_1.default)('2022-02-24T03:00:00.000Z');
 const updateWarDuration = () => {
-    const mCurrent = (0, moment_1.default)();
-    const warDuration = moment_1.default.duration(mCurrent.diff(mWarStart));
+    const mCurrent = (0, dayjs_1.default)();
+    const warDuration = dayjs_1.default.duration(mCurrent.diff(mWarStart));
     const sDuration = (0, common_1.getHumanizeDuration)(warDuration);
     document.querySelector('.war-duration__duration').innerText = sDuration;
     document.querySelector('.war-duration__days').innerText = `${Math.ceil(warDuration.asDays())} добу`;

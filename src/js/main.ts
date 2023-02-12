@@ -1,6 +1,11 @@
+import 'dayjs/locale/uk';
+import $ from 'jquery';
 // import Toast from 'bootstrap/js/dist/toast';
+import dayjs from 'dayjs';
+// import 'dayjs/locale/uk';
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import Mgrs, { LatLon } from 'geodesy/mgrs';
-import moment from 'moment';
 import {
 	ALERT_UPDATE_INTERVAL,
 	API_KEY,
@@ -11,12 +16,9 @@ import {
 } from './common';
 import { csv2svgInit } from './csv2svg';
 import { btnAlertAlarmEnableClick, updateAlertAlarmEnableButton, updateRaidAlert } from './raidAlert';
-
-try {
-	moment.locale(navigator.language);
-} catch (error) {
-	moment.locale('uk-UA');
-}
+dayjs.extend(duration);
+dayjs.extend(relativeTime);
+// dayjs.locale('uk');
 
 $(function () {
 	$('#editDate').on('change', printUTCDate);
@@ -45,7 +47,7 @@ $(function () {
 const printUTCDate = () => {
 	const date = $('#editDate').val();
 	const time = $('#editTime').val();
-	const mm = moment(`${date} ${time}`);
+	const mm = dayjs(`${date} ${time}`, 'YYYY-MM-DD HH:mm');
 	$('#utcDate').val(mm.toISOString());
 };
 
@@ -62,7 +64,7 @@ const onTimeStampSubmit = (event: MouseEvent) => {
  * Reset the date and time fields to the current date and time
  */
 const resetToCurrentDateTime = () => {
-	const mmCurrent = moment();
+	const mmCurrent = dayjs();
 	$('#editDate').val(mmCurrent.format('YYYY-MM-DD'));
 	$('#editTime').val(mmCurrent.format('HH:mm'));
 	printUTCDate();
@@ -266,12 +268,11 @@ const updatePlaceFromCoordinates = (coordinates: number[]) => {
 		});
 };
 
-const mWarStart = moment('2022-02-24T03:00:00.000Z');
+const mWarStart = dayjs('2022-02-24T03:00:00.000Z');
 const updateWarDuration = () => {
-	const mCurrent = moment();
-	const warDuration = moment.duration(mCurrent.diff(mWarStart));
+	const mCurrent = dayjs();
+	const warDuration = dayjs.duration(mCurrent.diff(mWarStart));
 	const sDuration = getHumanizeDuration(warDuration);
-	// const sDuration = `${warDuration.months()} міс. ${warDuration.days()} д. ${warDuration.hours()} год. ${warDuration.minutes()} хв.`;
 	(document.querySelector('.war-duration__duration') as HTMLDivElement).innerText = sDuration;
 	(document.querySelector('.war-duration__days') as HTMLDivElement).innerText = `${Math.ceil(
 		warDuration.asDays()

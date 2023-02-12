@@ -4,7 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateAlertAlarmEnableButton = exports.btnAlertAlarmEnableClick = exports.updateRaidAlert = void 0;
-const moment_1 = __importDefault(require("moment"));
+const dayjs_1 = __importDefault(require("dayjs"));
+const jquery_1 = __importDefault(require("jquery"));
 const common_1 = require("./common");
 const updateRaidAlert = () => {
     fetch('https://alerts.com.ua/api/states', {
@@ -16,12 +17,12 @@ const updateRaidAlert = () => {
         .then((data) => {
         const regionsWithAlerts = data.states.filter((state) => state.alert);
         regionsWithAlerts.sort((a, b) => -(a.changed || '2022-02-24T05:00:00+02:00').localeCompare(b.changed || '2022-02-24T05:00:00+02:00'));
-        const now = (0, moment_1.default)();
-        const container = $('.alarm__container').empty();
-        $('.alarm__date').text(`(станом на ${(0, moment_1.default)(data.last_update).format('L LT')})`);
+        const now = (0, dayjs_1.default)();
+        const container = (0, jquery_1.default)('.alarm__container').empty();
+        (0, jquery_1.default)('.alarm__date').text(`(станом на ${(0, dayjs_1.default)(data.last_update).format('DD.MM.YYYY HH:mm')})`);
         regionsWithAlerts.forEach(({ name, id, changed }) => {
-            const m = (0, moment_1.default)(changed);
-            const duration = moment_1.default.duration(now.diff(m));
+            const m = (0, dayjs_1.default)(changed);
+            const duration = dayjs_1.default.duration(now.diff(m));
             const durationInMinutes = duration.asMinutes();
             const containerColorClass = durationInMinutes < 120
                 ? durationInMinutes < 10
@@ -30,13 +31,13 @@ const updateRaidAlert = () => {
                         ? 'alarm__region-container--danger alarm__light_text'
                         : 'alarm__region-container--info'
                 : '';
-            const sStarted = duration.isValid() ? m.format('LT L') : '';
-            $(`<div class="alarm__region-container rounded px-2 py-1 ${containerColorClass}" id="alarmRegion${id}"></div>`)
+            const sStarted = !isNaN(duration.asMilliseconds()) ? ` в ${m.format('DD.MM.YYYY HH:mm')}` : '';
+            (0, jquery_1.default)(`<div class="alarm__region-container rounded px-2 py-1 ${containerColorClass}" id="alarmRegion${id}"></div>`)
                 .append(`<div class="alarm__region-title fs-5">${name}</div>`)
-                .append($('<div class="d-flex justify-content-between align-items-end"></div>')
+                .append((0, jquery_1.default)('<div class="d-flex justify-content-between align-items-end"></div>')
                 .append(`<div class="alarm__duration text-nowrap"><i class="bi bi-clock"></i> Триває ${(0, common_1.getHumanizeDuration)(duration)}</div>
 					`)
-                .append(`<div class="alarm__started text-truncate ms-1 text-small" title="Оголошено в ${sStarted}"><i class="bi bi-megaphone"></i> ${sStarted}</div>`))
+                .append(`<div class="alarm__started text-truncate ms-1 text-small" title="Оголошено${sStarted}"><i class="bi bi-megaphone"></i> ${sStarted}</div>`))
                 .appendTo(container);
         });
         if (Notify.allow())
@@ -50,9 +51,9 @@ const btnAlertAlarmEnableClick = () => {
 exports.btnAlertAlarmEnableClick = btnAlertAlarmEnableClick;
 const updateAlertAlarmEnableButton = () => {
     if (Notification.permission === 'default')
-        $('#btnAlertAlarmEnable').removeClass('disabled');
+        (0, jquery_1.default)('#btnAlertAlarmEnable').removeClass('disabled');
     else
-        $('#btnAlertAlarmEnable').addClass('disabled');
+        (0, jquery_1.default)('#btnAlertAlarmEnable').addClass('disabled');
 };
 exports.updateAlertAlarmEnableButton = updateAlertAlarmEnableButton;
 const notifyAlerts = (newAlerts) => {
