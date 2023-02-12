@@ -263,3 +263,5 @@ cython_debug/
 
 .env
 data/*
+js/*
+css/*
