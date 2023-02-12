@@ -30,7 +30,7 @@ export const updateRaidAlert = () => {
 							? 'alarm__region-container--danger alarm__light_text'
 							: 'alarm__region-container--info'
 						: '';
-				const sStarted = !isNaN(duration.asMilliseconds()) ? ` в ${m.format('DD.MM.YYYY HH:mm')}` : '';
+				const sStarted = !isNaN(duration.asMilliseconds()) ? m.format('DD.MM.YYYY HH:mm') : '';
 				$(`<div class="alarm__region-container rounded px-2 py-1 ${containerColorClass}" id="alarmRegion${id}"></div>`)
 					.append(`<div class="alarm__region-title fs-5">${name}</div>`)
 					.append(
@@ -42,7 +42,7 @@ export const updateRaidAlert = () => {
 					`
 							)
 							.append(
-								`<div class="alarm__started text-truncate ms-1 text-small" title="Оголошено${sStarted}"><i class="bi bi-megaphone"></i> ${sStarted}</div>`
+								`<div class="alarm__started text-truncate ms-1 text-small" title="Оголошено ${sStarted}"><i class="bi bi-megaphone"></i> ${sStarted}</div>`
 							)
 					)
 					.appendTo(container);
