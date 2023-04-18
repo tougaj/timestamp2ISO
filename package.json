@@ -47,7 +47,9 @@
 		"webpack-stream": "^7.0.0"
 	},
 	"dependencies": {
+		"@types/proj4": "^2.5.2",
 		"csv-reader": "^1.0.10",
-		"geodesy": "^2.4.0"
+		"geodesy": "^2.4.0",
+		"proj4": "^2.9.0"
 	}
 }

@@ -16,6 +16,7 @@ import {
 } from './common';
 import { csv2svgInit } from './csv2svg';
 import { btnAlertAlarmEnableClick, updateAlertAlarmEnableButton, updateRaidAlert } from './raidAlert';
+import { fromDecimalToRect, fromRectToDecimal } from './rectCoordsUtils';
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 // dayjs.locale('uk');
@@ -28,6 +29,7 @@ $(function () {
 	$('#formLat input[name]').add('#formLon input[name]').on('change', onDegreeChange);
 	$('.btn-copy-to-clipboard').on('click', copyInputToClipboard);
 	$('#editDegreeNumeric').on('change', onEditDegreeNumericChange);
+	$('#editUsk2000').on('change', onEditUsk2000Change);
 	$('#editMgrs').on('change', onEditMgrsChange);
 	$('#btnAlertAlarmEnable').on('click', btnAlertAlarmEnableClick);
 	csv2svgInit();
@@ -144,6 +146,16 @@ function onEditDegreeNumericChange(this: JQuery) {
 	updateDegreesFromCoordinates($(this).val() as string);
 }
 
+function onEditUsk2000Change(this: JQuery) {
+	const decimalCoords = ($(this).val() as string)
+		.split(/[,\s]+/i)
+		.map(Number)
+		.filter((val) => !isNaN(val));
+	if (decimalCoords.length !== 2) return;
+	const coordinates = fromRectToDecimal({ x: decimalCoords[0], y: decimalCoords[1] });
+	updateDegreesFromCoordinates(coordinates.join(', '));
+}
+
 function onEditMgrsChange(this: JQuery) {
 	const mgrs = Mgrs.parse(($(this).val() as string).toUpperCase());
 	const latlon = mgrs.toUtm().toLatLon();
@@ -220,7 +232,9 @@ const updateDegreesFromCoordinates = (coordinates: string) => {
 	if (coords.length !== 2) return;
 	const degree = getDegreeFromDecimal(coords[0], 'N') + ' ' + getDegreeFromDecimal(coords[1], 'E');
 
-	(document.getElementById('editDegreeNumeric') as HTMLInputElement).value = coordinates;
+	(document.getElementById('editDegreeNumeric') as HTMLInputElement).value = coords
+		.map((c) => parseFloat(c.toFixed(6)))
+		.join(', ');
 
 	(document.querySelector('#editDegree') as HTMLInputElement).value = degree;
 
@@ -228,6 +242,11 @@ const updateDegreesFromCoordinates = (coordinates: string) => {
 		.toUtm()
 		.toMgrs()
 		.toString();
+
+	const usk2000Coordinates = fromDecimalToRect(coords[0], coords[1]);
+	(
+		document.querySelector('#editUsk2000') as HTMLInputElement
+	).value = `${usk2000Coordinates.x}, ${usk2000Coordinates.y}`;
 
 	// const p = new LatLon(0, 0);
 	// console.log(p.toUtm().toMgrs().toString());
